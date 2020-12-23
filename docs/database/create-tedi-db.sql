@@ -10,30 +10,32 @@ ALTER DATABASE server_db CHARACTER SET utf8 COLLATE utf8_general_ci;
 CREATE TABLE IF NOT EXISTS `Customers` (
   `CustomerId` Integer NOT NULL AUTO_INCREMENT,
   `Role` Varchar(20),
-  `Name` Varchar(32),
+  `Name` Varchar(255),
   `Phone` Varchar(20),
   `Email` Varchar(64) NOT NULL UNIQUE,
   `Password` Varchar(64) NOT NULL,
-  `imageUrl` MEDIUMTEXT,
-  `provider` Varchar(255),
-  `providerId` Integer,
+  `ImageUrl` MEDIUMTEXT,
+  `Provider` Varchar(255),
+  `ProviderId` Integer,
   `CreationDate` Timestamp NOT NULL,
   `UserVerified` boolean,
+  `Active` boolean,
   PRIMARY KEY (`CustomerId`)
 );
 
 CREATE TABLE IF NOT EXISTS `Suppliers` (
   `SupplierId` Integer NOT NULL AUTO_INCREMENT,
   `Role` Varchar(20),
-  `Name` Varchar(32),
+  `Name` Varchar(255),
   `Phone` Varchar(20),
   `Email` Varchar(64) NOT NULL UNIQUE,
   `Password` Varchar(64) NOT NULL,
-  `imageUrl` MEDIUMTEXT,
-  `recipient` Varchar(255),
-  `recipientId` Integer,
+  `ImageUrl` MEDIUMTEXT,
+  `Recipient` Varchar(255),
+  `RecipientId` Integer,
   `CreationDate` Timestamp NOT NULL,
   `UserVerified` boolean,
+  `Active` boolean,
   PRIMARY KEY (`SupplierId`)
 );
 
@@ -70,6 +72,7 @@ CREATE TABLE IF NOT EXISTS `DeliveryOrders` (
 );
 
 CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
+  `id` Integer NOT NULL AUTO_INCREMENT,
   `DeliveryOrderId` Integer,
   `LineNum` Integer NOT NULL,
   `BaseRef` Varchar(64) NOT NULL,
@@ -82,6 +85,7 @@ CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   `Price` Numeric(10,2),
   `Currency` Varchar(10),
   `LineTotal` Numeric(10,2),
+  `LineNet` Numeric(10,2),
   `LineVat` Numeric(10,2),
   `DiscountPrcnt` Varchar(10),
   `VatPrcnt` Numeric(10,2),
@@ -89,10 +93,11 @@ CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   `Active` boolean,
   `OnTheWay` boolean,
   `ScheduledShipDate` Varchar(64) NOT NULL,
+  `Comments` Text,
   `CreationDate` Timestamp NOT NULL,
   `ModifyDate` Timestamp NOT NULL
 );
-
+--Trzeba bedzie zaimplementowac cos na wzor danych podstawowych Yuppim
 CREATE TABLE IF NOT EXISTS `Items` (
   `ItemId` Integer NOT NULL AUTO_INCREMENT,
   `ItemCode` Varchar(100),
