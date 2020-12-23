@@ -39,8 +39,8 @@ CREATE TABLE IF NOT EXISTS `Suppliers` (
 
 CREATE TABLE IF NOT EXISTS `Relations` (
   `RelationId` Integer NOT NULL AUTO_INCREMENT,
-  `SupplierId` Varchar(20),
-  `CustomerId` Varchar(32),
+  `SupplierId` Integer,
+  `CustomerId` Integer,
   `Active` boolean,
   `CreationDate` Timestamp NOT NULL,
   PRIMARY KEY (`RelationId`),
@@ -62,11 +62,11 @@ CREATE TABLE IF NOT EXISTS `DeliveryOrders` (
   `DocNet` Numeric(10,2), -- net value
   `DocVatSum` Numeric(10,2), -- tax value
   `DocNumberPosition` Integer,
-  PRIMARY KEY (`RelationId`)
+  PRIMARY KEY (`DeliveryOrderId`)
 );
 
 CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
-  `DetailsDeliveryOrderId` Integer NOT NULL AUTO_INCREMENT, --tworzonu z DocNumber w tabeli DeliveryOrders
+  `DetailsDeliveryOrderId` Integer NOT NULL AUTO_INCREMENT,
   `LineNum` Integer NOT NULL,
   `DocNumber` Integer NOT NULL,
   `SupplierId` Varchar(20),
@@ -85,8 +85,19 @@ CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   `Active` boolean,
   `CreationDate` Timestamp NOT NULL,
   PRIMARY KEY (`DetailsDeliveryOrderId`)
-  FOREIGN KEY (`DocNumber`)
-    REFERENCES DeliveryOrders(DocNumber),
 );
 
+CREATE TABLE IF NOT EXISTS `Items` (
+  `ItemId` Integer NOT NULL AUTO_INCREMENT,
+  `ItemCode` Varchar(100),
+  `ItemName` Varchar(255),
+  `CodeBars` Varchar(13),
+  `Price` Numeric(10,2),
+  `Currency` Varchar(10),
+  `VatPrcnt` Numeric(10,2),
+  `VatGroup` Varchar(10),
+  `Active` boolean,
+  `Availability` Varchar(255),
+  PRIMARY KEY (`ItemId`)
+);
 
