@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `Customers` (
   `Password` Varchar(64) NOT NULL,
   `imageUrl` MEDIUMTEXT,
   `provider` Varchar(255),
-  `providerId` Varchar(255),
+  `providerId` Integer,
   `CreationDate` Timestamp NOT NULL,
   `UserVerified` boolean,
   PRIMARY KEY (`CustomerId`)
@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS `Suppliers` (
   `Email` Varchar(64) NOT NULL UNIQUE,
   `Password` Varchar(64) NOT NULL,
   `imageUrl` MEDIUMTEXT,
-  `provider` Varchar(255),
-  `providerId` Varchar(255),
+  `recipient` Varchar(255),
+  `recipientId` Integer,
   `CreationDate` Timestamp NOT NULL,
   `UserVerified` boolean,
   PRIMARY KEY (`SupplierId`)
@@ -63,14 +63,14 @@ CREATE TABLE IF NOT EXISTS `DeliveryOrders` (
   `DocTotal` Numeric(10,2),  -- total value order
   `DocNet` Numeric(10,2), -- net value
   `DocVatSum` Numeric(10,2), -- tax value
-  `Description` Varchar(MAX),
+  `Description` Text,
   `CreationDate` Timestamp NOT NULL,
   `ModifyDate` Timestamp NOT NULL,
   PRIMARY KEY (`DeliveryOrderId`)
 );
 
 CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
-  `DeliveryOrderId`,
+  `DeliveryOrderId` Integer,
   `LineNum` Integer NOT NULL,
   `BaseRef` Varchar(64) NOT NULL,
   `SupplierId` Integer,
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   `OnTheWay` boolean,
   `ScheduledShipDate` Varchar(64) NOT NULL,
   `CreationDate` Timestamp NOT NULL,
-  `ModifyDate` Timestamp NOT NULL,
+  `ModifyDate` Timestamp NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS `Items` (
