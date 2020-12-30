@@ -1,16 +1,16 @@
 package com.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class DeliveryOrders {
 
   @Id
@@ -31,13 +31,13 @@ public class DeliveryOrders {
   @Column(name = "DocStatus", length = 1, nullable = false)
   private char DocStatus;
 
-  @ManyToOne
-  @Column(name = "SupplierId")
-  private Suppliers suppliers;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "SupplierId")
+  private Suppliers supplier;
 
-  @ManyToOne
-  @Column(name = "CustomerId")
-  private Customers customers;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "CustomerId")
+  private Customers customer;
 
   @Column(name = "DocTotal")
   private double docTotal;

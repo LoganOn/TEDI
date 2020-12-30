@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -50,4 +51,10 @@ public class Suppliers {
 
   @Column(name = "Active")
   private Boolean active;
+
+  @OneToMany(mappedBy = "supplier", orphanRemoval = true)
+  private List<DeliveryOrders> deliveryOrdersList;
+
+  @OneToMany(mappedBy = "supplier", orphanRemoval = true)
+  private List<Relations> relationsList;
 }

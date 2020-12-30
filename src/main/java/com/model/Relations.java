@@ -18,13 +18,13 @@ public class Relations {
   @Column(name = "RelationId")
   private Long relationId;
 
-  @ManyToOne
-  @Column(name = "SupplierId")
-  private Suppliers suppliers;
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "SupplierId")
+  private Suppliers supplier;
 
-  @ManyToOne
-  @Column(name = "CustomerId")
-  private Customers customers;
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "CustomerId")
+  private Customers customer;
 
   @Column(name = "Active")
   private Boolean active;

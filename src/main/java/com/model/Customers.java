@@ -1,16 +1,17 @@
 package com.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
 public class Customers {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -49,4 +50,10 @@ public class Customers {
 
   @Column(name = "Active")
   private Boolean active;
+
+  @OneToMany(mappedBy = "customer", orphanRemoval = true)
+  private List<DeliveryOrders> deliveryOrdersList;
+
+  @OneToMany(mappedBy = "customer", orphanRemoval = true)
+  private List<Relations> relationsList;
 }
