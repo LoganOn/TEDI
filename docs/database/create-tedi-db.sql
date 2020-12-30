@@ -5,7 +5,7 @@ GRANT ALL PRIVILEGES ON tedi_db.* TO 'tedi'@'localhost';
 FLUSH PRIVILEGES;
 
 USE tedi_db;
-ALTER DATABASE server_db CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER DATABASE tedi_db CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 CREATE TABLE IF NOT EXISTS `Customers` (
   `CustomerId` Integer NOT NULL AUTO_INCREMENT,
@@ -95,7 +95,8 @@ CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   `ScheduledShipDate` Varchar(64) NOT NULL,
   `Comments` Text,
   `CreationDate` Timestamp NOT NULL,
-  `ModifyDate` Timestamp NOT NULL
+  `ModifyDate` Timestamp NOT NULL,
+  PRIMARY KEY (`id`)
 );
 --Trzeba bedzie zaimplementowac cos na wzor danych podstawowych Yuppim
 CREATE TABLE IF NOT EXISTS `Items` (
