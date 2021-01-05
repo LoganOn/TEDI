@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-//@RequestMapping(value = "/api/delivery", produces = MediaType.APPLICATION_JSON_VALUE)
-@RequestMapping("/api/delivery")
+@RequestMapping(value = "/api/delivery", produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
 public class DeliveryOrdersController {
 
@@ -29,5 +28,4 @@ public class DeliveryOrdersController {
             HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }
-
 }
