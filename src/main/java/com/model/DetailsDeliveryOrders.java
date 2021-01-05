@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @Builder
-public class DetailsDeliveryOrder {
+public class DetailsDeliveryOrders {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

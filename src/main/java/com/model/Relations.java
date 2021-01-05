@@ -21,12 +21,12 @@ public class Relations {
   @Column(name = "RelationId")
   private Long relationId;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne
   @JoinColumn(name = "SupplierId")
   @JsonBackReference
   private Suppliers supplier;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne
   @JoinColumn(name = "CustomerId")
   @JsonBackReference
   private Customers customer;
