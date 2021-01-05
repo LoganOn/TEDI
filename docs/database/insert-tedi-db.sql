@@ -28,12 +28,12 @@ VALUES
 (8, 3, 3, false, NOW() - INTERVAL 10 HOUR, NOW() - INTERVAL 150 MINUTE);
 
 INSERT INTO `DeliveryOrders`
-  (`DeliveryOrderId`, `BaseRef`, `NumberOrderCustomer`, `DocNumberPositions`, `DocStatus`, `SupplierId`, `UserId`, `DocTotal`, `DocNet`, `DocVatSum`, `Description`, `CreationDate`, `ModifyDate`)
+  (`DeliveryOrderId`, `BaseRef`, `NumberOrderCustomer`, `DocNumberPositions`, `DocStatus`, `SupplierId`, `CustomerId`, `DocTotal`, `DocNet`, `DocVatSum`, `Description`, `CreationDate`, `ModifyDate`)
 VALUES
 (1, "ZAM-2020-20000", "202012101234", 6, "O", 1, 1, 6000, 4878.05, 1121.95, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam sit amet dui justo. Nullam et elit velit. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur ac imperdiet odio. Praesent sed fringilla lorem. Nulla facilisi. Cras eget eleifend mauris, eget euismod massa. Vivamus ultricies eu elit a fringilla. In mattis, ipsum et accumsan egestas, sem erat lobortis justo, et ullamcorper eros tortor eget ipsum.", NOW(), NOW());
 
 INSERT INTO `DetailsDeliveryOrders`
-  (`id`, `DeliveryOrderId`, `LineNum`, `BaseRef`, `SupplierId`, `UserId`, `ItemCode`, `ItemName`, `Quantity`, `CodeBars`, `Price`, `Currency`, `LineTotal`, `LineNet`, `LineVat`, `DiscountPrcnt`, `VatPrcnt`, `VatGroup`, `Active`, `OnTheWay`, `ScheduledShipDate`, `CreationDate`, `ModifyDate`)
+  (`id`, `DeliveryOrderId`, `LineNum`, `BaseRef`, `SupplierId`, `CustomerId`, `ItemCode`, `ItemName`, `Quantity`, `CodeBars`, `Price`, `Currency`, `LineTotal`, `LineNet`, `LineVat`, `DiscountPrcnt`, `VatPrcnt`, `VatGroup`, `Active`, `OnTheWay`, `ScheduledShipDate`, `CreationDate`, `ModifyDate`)
 VALUES
 (1, 1, 0, "ZAM-2020-20000", 1, 1, "XXX-Item1", "ItemName1", 1, "5900000000000", 1000,"PLN", 1000, 787, 813, "10%", 23, "DS23", 1, 0, "7 dni roboczych", NOW() - Interval 2 DAY, NOW() - Interval 2 DAY),
 (2, 1, 1, "ZAM-2020-20000", 1, 1, "XXX-Item2", "ItemName2", 1, "5900000000000", 1000,"PLN", 1000, 787, 813, "10%", 23, "DS23", 1, 0, "7 dni roboczych", NOW() - Interval 2 DAY, NOW() - Interval 2 DAY),

@@ -1,8 +1,7 @@
 package com.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -11,6 +10,8 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@Builder
 public class DetailsDeliveryOrder {
 
   @Id
@@ -28,11 +29,13 @@ public class DetailsDeliveryOrder {
   private String baseRef;
 
   @ManyToOne
-  @Column(name = "SupplierId")
+  @JoinColumn(name = "SupplierId")
+  @JsonBackReference
   private Suppliers suppliers;
 
   @ManyToOne
-  @Column(name = "CustomerId")
+  @JoinColumn(name = "CustomerId")
+  @JsonBackReference
   private Customers customers;
 
   @Column(name = "ItemCode", length = 100)

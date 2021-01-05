@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `DeliveryOrders` (
   `DocNumberPositions` Integer,
   `DocStatus` Varchar(1) NOT NULL , -- close, open, cancelled
   `SupplierId` Integer,
-  `UserId` Integer,
+  `CustomerId` Integer,
   `DocTotal` Numeric(10,2),  -- total value order
   `DocNet` Numeric(10,2), -- net value
   `DocVatSum` Numeric(10,2), -- tax value
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   `LineNum` Integer NOT NULL,
   `BaseRef` Varchar(64) NOT NULL,
   `SupplierId` Integer,
-  `UserId` Integer,
+  `CustomerId` Integer,
   `ItemCode` Varchar(100),
   `ItemName` Varchar(255),
   `Quantity` Numeric(10,2),

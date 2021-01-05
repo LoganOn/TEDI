@@ -1,5 +1,6 @@
 package com.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -33,10 +34,12 @@ public class DeliveryOrders {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "SupplierId")
+  @JsonBackReference
   private Suppliers supplier;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "CustomerId")
+  @JsonBackReference
   private Customers customer;
 
   @Column(name = "DocTotal")

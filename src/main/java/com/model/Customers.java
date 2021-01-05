@@ -1,5 +1,6 @@
 package com.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -52,8 +53,10 @@ public class Customers {
   private Boolean active;
 
   @OneToMany(mappedBy = "customer", orphanRemoval = true)
+  @JsonManagedReference
   private List<DeliveryOrders> deliveryOrdersList;
 
   @OneToMany(mappedBy = "customer", orphanRemoval = true)
+  @JsonManagedReference
   private List<Relations> relationsList;
 }

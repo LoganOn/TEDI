@@ -1,7 +1,9 @@
 package com.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -11,6 +13,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
 public class Relations {
 
   @Id
@@ -20,10 +23,12 @@ public class Relations {
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "SupplierId")
+  @JsonBackReference
   private Suppliers supplier;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "CustomerId")
+  @JsonBackReference
   private Customers customer;
 
   @Column(name = "Active")
