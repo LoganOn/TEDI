@@ -3,7 +3,7 @@ USE tedi_db;
 INSERT INTO `Customers`
 (`CustomerId`, `Role`, `Name`, `Phone`, `Email`, `Password`, `ImageUrl`, `Provider`,`ProviderId`, `CreationDate`, `UserVerified`, `Active`)
 VALUES
-(1, "Customer", "Femax", "555666777", "femax@femax.pl", "#Femax123",null, null, null, NOW(), true, true),
+(1, "Customer", "Femax", "555666777", "femax@femax.pl", "$2y$11$i4okoAz3tnhyQ/GJY1vEiOhydkLJ/9E/EQ.O4EcEY.SYDC0pt6WQ2",null, null, null, NOW(), true, true),
 (2, "Customer", "ABC", "444555666", "abc@abc.pl", "#ABC1234",null, null, null, NOW() - INTERVAL 1 WEEK, true, true),
 (3, "Customer", "AGD sp zoo", "503444123", "agd@agd.pl", "maleAgd1234",null, null, null, NOW() - INTERVAL 5 DAY, false, true);
 
