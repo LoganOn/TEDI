@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `Name` Varchar(255),
   `Phone` Varchar(20),
   `Email` Varchar(64) NOT NULL UNIQUE,
-  `Password` Varchar(64) NOT NULL,
+  `Password` Varchar(255) NOT NULL,
   `ImageUrl` MEDIUMTEXT,
   `Provider` Varchar(255),
   `ProviderId` Integer,
