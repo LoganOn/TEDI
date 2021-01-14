@@ -31,7 +31,7 @@ public class Users {
   @Column(name = "Email", nullable = false, unique = true, length = 64)
   private String email;
 
-  @Column(name = "Password", nullable = false, length = 64)
+  @Column(name = "Password", nullable = false, length = 255)
   private String password;
 
   @Column(name = "ImageUrl")
@@ -52,6 +52,13 @@ public class Users {
   @Column(name = "Active")
   private Boolean active;
 
+  public Users(String name, String email, String password, String phone, String role) {
+    this.name = name;
+    this.email = email;
+    this.password = password;
+    this.phone = phone;
+    this.role = role;
+  }
 //  @OneToMany(mappedBy = "user", orphanRemoval = true)
 //  @JsonManagedReference
 //  private List<DeliveryOrders> deliveryOrdersList;
