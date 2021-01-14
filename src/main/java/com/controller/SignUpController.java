@@ -6,9 +6,12 @@ import com.exception.UserNotRegisteredException;
 import com.exception.ValidationFailure;
 import com.handler.UserSignupDto;
 import com.model.Users;
+import com.service.EmailSender;
 import com.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,6 +36,9 @@ public class SignUpController {
 
   private final UserService userService;
 
+  @Autowired
+  private final EmailSender emailSender;
+
   private final Pattern pattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}+$");
 
   //TODO Change signature to RedirectView
@@ -56,6 +62,7 @@ public class SignUpController {
       throw new ValidationFailure(VALIDATION_FAILURE);
     }
     userService.save(signupDto);
+    emailSender.sendEmail("k.krawczyk@femax.pl", "TEST", "TESSSSSSST");
     return signupDto;
   }
 
