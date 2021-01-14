@@ -1,6 +1,7 @@
 package com.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,22 +15,18 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Relations {
+public class RelationsUsers {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "RelationId")
-  private Long relationId;
+  @Column(name = "RelationUsersId")
+  private Long relationUsersId;
 
-  @ManyToOne
-  @JoinColumn(name = "SupplierId")
-  @JsonBackReference
-  private Suppliers supplier;
+  @Column(name = "UserId1")
+  private Long userId1;
 
-  @ManyToOne
-  @JoinColumn(name = "CustomerId")
-  @JsonBackReference
-  private Customers customer;
+  @Column(name = "UserId2")
+  private Long userId2;
 
   @Column(name = "Active")
   private Boolean active;

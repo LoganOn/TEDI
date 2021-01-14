@@ -1,7 +1,5 @@
 package com.controller;
 
-import com.model.Customers;
-import com.repository.CustomersRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,15 +15,15 @@ import java.util.List;
 @AllArgsConstructor
 public class CustomersController {
 
-    private CustomersRepository customersRepository;
-
-    @GetMapping("/all")
-    public ResponseEntity<?> findAllCustomers() {
-        List<Customers> customers = (List<Customers>) customersRepository.findAll();
-        return new ResponseEntity<>(
-                customers, customers == null ?
-                HttpStatus.NOT_FOUND : customers.isEmpty() ?
-                HttpStatus.NO_CONTENT : HttpStatus.OK
-        );
-    }
+//    private CustomersRepository customersRepository;
+//
+//    @GetMapping("/all")
+//    public ResponseEntity<?> findAllCustomers() {
+//        List<Customers> customers = (List<Customers>) customersRepository.findAll();
+//        return new ResponseEntity<>(
+//                customers, customers == null ?
+//                HttpStatus.NOT_FOUND : customers.isEmpty() ?
+//                HttpStatus.NO_CONTENT : HttpStatus.OK
+//        );
+//    }
 }

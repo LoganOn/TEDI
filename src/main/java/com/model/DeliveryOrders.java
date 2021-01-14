@@ -31,16 +31,12 @@ public class DeliveryOrders {
   //Close, open, cancelled
   @Column(name = "DocStatus", length = 1, nullable = false)
   private char DocStatus;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "SupplierId")
-  @JsonBackReference
-  private Suppliers supplier;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "CustomerId")
-  @JsonBackReference
-  private Customers customer;
+  //owner document (supplier)
+  @Column(name = "UserId1")
+  private Long userId1;
+  //customer
+  @Column(name = "UserId2")
+  private Long userId2;
 
   @Column(name = "DocTotal")
   private double docTotal;

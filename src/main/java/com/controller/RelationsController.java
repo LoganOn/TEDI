@@ -1,7 +1,7 @@
 package com.controller;
 
-import com.model.Relations;
-import com.repository.RelationsRepository;
+import com.model.RelationsUsers;
+import com.repository.RelationsUsersRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,11 +17,11 @@ import java.util.List;
 @AllArgsConstructor
 public class RelationsController {
 
-    private RelationsRepository relationsRepository;
+    private RelationsUsersRepository relationsRepository;
 
     @GetMapping("/all")
     public ResponseEntity<?> findAllDetailsOrders() {
-        List<Relations> relationsList = (List<Relations>) relationsRepository.findAll();
+        List<RelationsUsers> relationsList = (List<RelationsUsers>) relationsRepository.findAll();
         return new ResponseEntity<>(
                 relationsList, relationsList == null ?
                 HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
