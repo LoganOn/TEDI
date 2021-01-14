@@ -1,6 +1,8 @@
 package com.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,6 +14,7 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @Builder
+@ToString
 public class DetailsDeliveryOrders {
 
   @Id
@@ -28,14 +31,17 @@ public class DetailsDeliveryOrders {
   @Column(name = "BaseRef", length = 64)
   private String baseRef;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "SupplierId")
   @JsonBackReference
+  @JsonIgnore
+//  @JsonIgnoreProperties({"hibernateLazyInitializer", "Suppliers"})
   private Suppliers suppliers;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "CustomerId")
   @JsonBackReference
+
   private Customers customers;
 
   @Column(name = "ItemCode", length = 100)
@@ -86,9 +92,9 @@ public class DetailsDeliveryOrders {
   @Column(name = "Comments")
   private String comments;
 
-  @Column(name = "CreationDate",  nullable = false)
+  @Column(name = "CreationDate", nullable = false)
   private Timestamp creationDate = new Timestamp(System.currentTimeMillis());
 
-  @Column(name = "ModifyDate",  nullable = false)
+  @Column(name = "ModifyDate", nullable = false)
   private Timestamp modifyDate = new Timestamp(System.currentTimeMillis());
 }

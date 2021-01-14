@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 @Builder
 @NoArgsConstructor
+@ToString
 public class Customers {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
