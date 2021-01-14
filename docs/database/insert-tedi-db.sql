@@ -4,12 +4,12 @@ INSERT INTO `Users`
 (`UserId`, `Role`, `Name`, `Phone`, `Email`, `Password`, `ImageUrl`, `Provider`,`ProviderId`, `CreationDate`, `UserVerified`, `Active`)
 VALUES
 (1, "Customer", "Femax", "555666777", "femax@femax.pl", "$2y$11$abnU1/30SXSjOKEmLTiUCOvBs3ksBZ7SyB6n5rUKTLnWj32gPAYAm",null, null, null, NOW(), true, true),
-(2, "Customer", "ABC", "444555666", "abc@abc.pl", "#ABC1234",null, null, null, NOW() - INTERVAL 1 WEEK, true, true),
-(3, "Customer", "AGD sp zoo", "503444123", "agd@agd.pl", "maleAgd1234",null, null, null, NOW() - INTERVAL 5 DAY, false, true),
-(4, "Supplier", "Terma", "482034578", "terma@terma.pl", "terma123", null, null, null, NOW(), true, true),
-(5, "Supplier", "Purmo", "482074578", "purmo@purmogroup.com.pl", "purmo123", null, null, null, NOW() - INTERVAL 1 WEEK, true, true),
-(6, "Supplier", "Grohe", "600700800", "grohe@grohe.de", "grohe123", null, null, null, NOW() - INTERVAL 12 WEEK, true, true),
-(7, "Supplier", "TECE", "678876321", "tece@tece.pl", "tece123", null, null, null, NOW() - INTERVAL 10 MONTH, true, true);
+(2, "Customer", "ABC", "444555666", "abc@abc.pl", "$2y$11$p4AoDAFoXEvASKoo8aYckuVzs1kbCRb2nXpF3nvVsbtQzm6BxU2L6",null, null, null, NOW() - INTERVAL 1 WEEK, true, true),
+(3, "Customer", "AGD sp zoo", "503444123", "agd@agd.pl", "$2y$11$DCxQT.OL15yxV.wuHURNxuVdtdtUrIX8GO5US9ZtUSL2uHivDaKfW",null, null, null, NOW() - INTERVAL 5 DAY, false, true),
+(4, "Supplier", "Terma", "482034578", "terma@terma.pl", "$2y$11$9cQqHcsfaGge0YALp8h...c5CsE4pwx9aBX9npAYeFOWoYQWODhdi", null, null, null, NOW(), true, true),
+(5, "Supplier", "Purmo", "482074578", "purmo@purmogroup.com.pl", "$2y$11$IckX.tsW2nrnZRxAPCks4.Lw0yu88lMi8Q9Fcw.QO.Yif1/Ep.98u", null, null, null, NOW() - INTERVAL 1 WEEK, true, true),
+(6, "Supplier", "Grohe", "600700800", "grohe@grohe.de", "$2y$11$1XZBKky8YmWnLsZogR9EbOT7TBSTCQrLcDjn5tZ2OS96Rg0gUo5Sq", null, null, null, NOW() - INTERVAL 12 WEEK, true, true),
+(7, "Supplier", "TECE", "678876321", "tece@tece.pl", "$2y$11$YAxxcfa.261smiBFvWGE6.QjSPPly.2E9./gFIYyXkESA9L4t0BWS", null, null, null, NOW() - INTERVAL 10 MONTH, true, true);
 
 INSERT INTO `RelationsUsers`
   (`RelationUsersId`, `UserId1`, `UserId2`, `Active`, `CreationDate`, `ModifyDate`)
