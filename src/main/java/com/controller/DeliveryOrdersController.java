@@ -1,9 +1,8 @@
 package com.controller;
 
 import com.model.DeliveryOrders;
-import com.repository.CustomersRepository;
 import com.repository.DeliveryOrdersRepository;
-import com.repository.SuppliersRepository;
+import com.repository.UsersRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,9 +22,7 @@ public class DeliveryOrdersController {
 
     private DeliveryOrdersRepository deliveryOrdersRepository;
 
-    private CustomersRepository customersRepository;
-
-    private SuppliersRepository suppliersRepository;
+    private UsersRepository usersRepository;
 
     @GetMapping
     public ResponseEntity<?> findAllOrders() {
@@ -49,7 +46,7 @@ public class DeliveryOrdersController {
 
     @GetMapping("/supplier/{id}")
     public ResponseEntity<?> findAllOrdersBySupplierId(@PathVariable Long id) {
-        List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllBySupplier(suppliersRepository.findById(id));
+        List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllByUserId1(usersRepository.findById(id));
         return new ResponseEntity<>(
                 deliveryOrders, deliveryOrders == null ?
                 HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
@@ -59,7 +56,7 @@ public class DeliveryOrdersController {
 
     @GetMapping("/customer/{id}")
     public ResponseEntity<?> findAllOrdersByCustomerId(@PathVariable Long id) {
-        List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllByCustomer(customersRepository.findById(id));
+        List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllByUserId2(usersRepository.findById(id));
         return new ResponseEntity<>(
                 deliveryOrders, deliveryOrders == null ?
                 HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?

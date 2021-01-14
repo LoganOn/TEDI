@@ -31,18 +31,11 @@ public class DetailsDeliveryOrders {
   @Column(name = "BaseRef", length = 64)
   private String baseRef;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "SupplierId")
-  @JsonBackReference
-  @JsonIgnore
-//  @JsonIgnoreProperties({"hibernateLazyInitializer", "Suppliers"})
-  private Suppliers suppliers;
+  @Column(name = "UserId1")
+  private Long userId1;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "CustomerId")
-  @JsonBackReference
-
-  private Customers customers;
+  @Column(name = "UserId2")
+  private Long userId2;
 
   @Column(name = "ItemCode", length = 100)
   private String itemCode;

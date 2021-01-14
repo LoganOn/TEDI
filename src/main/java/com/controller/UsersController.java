@@ -1,7 +1,7 @@
 package com.controller;
 
-import com.model.Customers;
-import com.repository.CustomersRepository;
+import com.model.Users;
+import com.repository.UsersRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,28 +15,28 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/api/customers", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
-public class CustomersController {
+public class UsersController {
 
-    private CustomersRepository customersRepository;
+    private UsersRepository usersRepository;
 
     @GetMapping
-    public ResponseEntity<?> findAllCustomers() {
-        List<Customers> customers = (List<Customers>) customersRepository.findAll();
+    public ResponseEntity<?> findAllUsers() {
+        List<Users> users = (List<Users>) usersRepository.findAll();
         return new ResponseEntity<>(
-                customers, customers == null ?
-                HttpStatus.NOT_FOUND : customers.isEmpty() ?
+                users, users == null ?
+                HttpStatus.NOT_FOUND : users.isEmpty() ?
                 HttpStatus.NO_CONTENT : HttpStatus.OK
         );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findCustomerById(@PathVariable Long id) {
-        Optional<Customers> customer = customersRepository.findById(id);
+    public ResponseEntity<?> findUserById(@PathVariable Long id) {
+        Optional<Users> user = usersRepository.findById(id);
         return new ResponseEntity<>(
-                customer, customer == null ?
-                HttpStatus.NOT_FOUND : customer.isEmpty() ?
+                user, user == null ?
+                HttpStatus.NOT_FOUND : user.isEmpty() ?
                 HttpStatus.NO_CONTENT : HttpStatus.OK
         );
     }

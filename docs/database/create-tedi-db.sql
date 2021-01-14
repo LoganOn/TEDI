@@ -7,8 +7,8 @@ FLUSH PRIVILEGES;
 USE tedi_db;
 ALTER DATABASE tedi_db CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-CREATE TABLE IF NOT EXISTS `Customers` (
-  `CustomerId` Integer NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `Users` (
+  `UserId` Integer NOT NULL AUTO_INCREMENT,
   `Role` Varchar(20),
   `Name` Varchar(255),
   `Phone` Varchar(20),
@@ -20,38 +20,17 @@ CREATE TABLE IF NOT EXISTS `Customers` (
   `CreationDate` Timestamp NOT NULL,
   `UserVerified` boolean,
   `Active` boolean,
-  PRIMARY KEY (`CustomerId`)
+  PRIMARY KEY (`UserId`)
 );
 
-CREATE TABLE IF NOT EXISTS `Suppliers` (
-  `SupplierId` Integer NOT NULL AUTO_INCREMENT,
-  `Role` Varchar(20),
-  `Name` Varchar(255),
-  `Phone` Varchar(20),
-  `Email` Varchar(64) NOT NULL UNIQUE,
-  `Password` Varchar(64) NOT NULL,
-  `ImageUrl` MEDIUMTEXT,
-  `Recipient` Varchar(255),
-  `RecipientId` Integer,
-  `CreationDate` Timestamp NOT NULL,
-  `UserVerified` boolean,
-  `Active` boolean,
-  PRIMARY KEY (`SupplierId`)
-);
-
-CREATE TABLE IF NOT EXISTS `Relations` (
-  `RelationId` Integer NOT NULL AUTO_INCREMENT,
-  `SupplierId` Integer,
-  `CustomerId` Integer,
+CREATE TABLE IF NOT EXISTS `RelationsUsers` (
+  `RelationUsersId` Integer NOT NULL AUTO_INCREMENT,
+  `UserId1` Integer,
+  `UserId2` Integer,
   `Active` boolean,
   `CreationDate` Timestamp NOT NULL,
   `ModifyDate` Timestamp NOT NULL,
-  PRIMARY KEY (`RelationId`),
-  FOREIGN KEY (`SupplierId`)
-    REFERENCES Suppliers(SupplierId),
-  FOREIGN KEY (`CustomerId`)
-    REFERENCES Customers(CustomerId)
-
+  PRIMARY KEY (`RelationUsersId`)
 );
 
 CREATE TABLE IF NOT EXISTS `DeliveryOrders` (
@@ -60,8 +39,8 @@ CREATE TABLE IF NOT EXISTS `DeliveryOrders` (
   `NumberOrderCustomer` Varchar(64) NOT NULL,
   `DocNumberPositions` Integer,
   `DocStatus` Varchar(1) NOT NULL , -- close, open, cancelled
-  `SupplierId` Integer,
-  `CustomerId` Integer,
+  `UserId1` Integer,
+  `UserId2` Integer,
   `DocTotal` Numeric(10,2),  -- total value order
   `DocNet` Numeric(10,2), -- net value
   `DocVatSum` Numeric(10,2), -- tax value
@@ -76,8 +55,8 @@ CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   `DeliveryOrderId` Integer,
   `LineNum` Integer NOT NULL,
   `BaseRef` Varchar(64) NOT NULL,
-  `SupplierId` Integer,
-  `CustomerId` Integer,
+  `UserId1` Integer,
+  `UserId2` Integer,
   `ItemCode` Varchar(100),
   `ItemName` Varchar(255),
   `Quantity` Numeric(10,2),
@@ -98,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   `ModifyDate` Timestamp NOT NULL,
   PRIMARY KEY (`id`)
 );
---Trzeba bedzie zaimplementowac cos na wzor danych podstawowych Yuppim
+#Trzeba bedzie zaimplementowac cos na wzor danych podstawowych Yuppim
 CREATE TABLE IF NOT EXISTS `Items` (
   `ItemId` Integer NOT NULL AUTO_INCREMENT,
   `ItemCode` Varchar(100),

@@ -1,26 +1,22 @@
 package com.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
-public class Suppliers {
+public class Users {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "SupplierId")
-  private Long supplierId;
+  @Column(name = "UserId")
+  private Long UserId;
 
   @Column(name = "Role", length = 20)
   private String role;
@@ -40,11 +36,11 @@ public class Suppliers {
   @Column(name = "ImageUrl")
   private String imageUrl;
 
-  @Column(name = "Recipient")
-  private String recipient;
+  @Column(name = "Provider")
+  private String provider;
 
-  @Column(name = "RecipientId")
-  private Long recipientId;
+  @Column(name = "ProviderId")
+  private Long providerId;
 
   @Column(name = "CreationDate",  nullable = false)
   private Timestamp creationDate = new Timestamp(System.currentTimeMillis());
@@ -55,11 +51,15 @@ public class Suppliers {
   @Column(name = "Active")
   private Boolean active;
 
-  @OneToMany(mappedBy = "supplier", orphanRemoval = true)
-  @JsonManagedReference
-  private List<DeliveryOrders> deliveryOrdersList;
+//  @OneToMany(mappedBy = "user", orphanRemoval = true)
+//  @JsonManagedReference
+//  private List<DeliveryOrders> deliveryOrdersList;
 
-  @OneToMany(mappedBy = "supplier", orphanRemoval = true)
-  @JsonManagedReference
-  private List<Relations> relationsList;
+//  @OneToMany(mappedBy = "userId1", orphanRemoval = true)
+//  @JsonManagedReference
+//  private List<RelationsUsers> relationsList1;
+//
+//  @OneToMany(mappedBy = "userId2", orphanRemoval = true)
+//  @JsonManagedReference
+//  private List<RelationsUsers> relationsList2;
 }

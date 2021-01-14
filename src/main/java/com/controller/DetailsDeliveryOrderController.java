@@ -22,23 +22,16 @@ public class DetailsDeliveryOrderController {
     @Autowired
     private DetailsDeliveryOrderRepository detailsDeliveryOrderRepository;
 
-//    @GetMapping("/all")
-//    @ResponseBody
-//    public ResponseEntity<?> findAllDetailsOrders() {
-//        List<DetailsDeliveryOrders> detailsDeliveryOrders = (List<DetailsDeliveryOrders>) detailsDeliveryOrderRepository.findAll();
-//        System.out.println(detailsDeliveryOrders.get(0).toString());
-//        return new ResponseEntity<>(
-//                detailsDeliveryOrders, detailsDeliveryOrders == null ?
-//                HttpStatus.NOT_FOUND : detailsDeliveryOrders.isEmpty() ?
-//                HttpStatus.NO_CONTENT : HttpStatus.OK
-//        );
-//    }
     @GetMapping("/all")
     @ResponseBody
-    public List<DetailsDeliveryOrders> findAllDetailsOrders() {
+    public ResponseEntity<?> findAllDetailsOrders() {
         List<DetailsDeliveryOrders> detailsDeliveryOrders = (List<DetailsDeliveryOrders>) detailsDeliveryOrderRepository.findAll();
         System.out.println(detailsDeliveryOrders.get(0).toString());
-        return  detailsDeliveryOrders;
+        return new ResponseEntity<>(
+                detailsDeliveryOrders, detailsDeliveryOrders == null ?
+                HttpStatus.NOT_FOUND : detailsDeliveryOrders.isEmpty() ?
+                HttpStatus.NO_CONTENT : HttpStatus.OK
+        );
     }
 }
 

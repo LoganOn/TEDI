@@ -1,9 +1,7 @@
 package com.repository;
 
-import com.model.Customers;
 import com.model.DeliveryOrders;
-import com.model.Relations;
-import com.model.Suppliers;
+import com.model.Users;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface DeliveryOrdersRepository extends CrudRepository<DeliveryOrders, Long> {
 
-    List<DeliveryOrders> findAllByCustomer (Optional<Customers> customer);
+    List<DeliveryOrders> findAllByUserId1 (Optional<Users> customer);
 
-    List<DeliveryOrders> findAllBySupplier (Optional<Suppliers> supplier);
+    List<DeliveryOrders> findAllByUserId2 (Optional<Users> supplier);
 }
