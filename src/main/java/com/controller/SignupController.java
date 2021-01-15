@@ -1,14 +1,19 @@
 package com.controller;
 
 
+import com.event.OnSignupCompleteEvent;
 import com.exception.BadRequestException;
 import com.exception.UserNotRegisteredException;
 import com.exception.ValidationFailure;
 import com.handler.UserSignupDto;
 import com.model.Users;
+import com.service.EmailSender;
 import com.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +28,7 @@ import java.util.regex.Pattern;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class SignUpController {
+public class SignupController {
 
   private final String LOG_ERROR_MSG_EMAIL_IN_USE = "User error while signing up - email already in use";
 
@@ -32,6 +37,10 @@ public class SignUpController {
   private final String INVALID_PASS = "User error while singing up - password should be six characters long and have at least one capital and one number";
 
   private final UserService userService;
+
+  private final EmailSender emailSender;
+
+  private final ApplicationEventPublisher eventPublisher;
 
   private final Pattern pattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}+$");
 
@@ -55,7 +64,8 @@ public class SignUpController {
     if(result.hasErrors()) {
       throw new ValidationFailure(VALIDATION_FAILURE);
     }
-    userService.save(signupDto);
+    Users registered = userService.save(signupDto);
+    eventPublisher.publishEvent(new OnSignupCompleteEvent(registered, request.getLocale(), "appUrl"));
     return signupDto;
   }
 
