@@ -14,6 +14,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @RequiredArgsConstructor
@@ -41,6 +43,23 @@ public class SecuritySettings extends WebSecurityConfigurerAdapter {
   public AuthenticationManager authenticationManagerBean() throws Exception {
     return super.authenticationManagerBean();
   }
+
+  @Bean
+  public WebMvcConfigurer corsConfigurerWebProfile() {
+    return new WebMvcConfigurer() {
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins(
+                        "http://localhost:3000"
+                )
+                .allowCredentials(true)
+                .allowedHeaders("*")
+                .allowedMethods("*");
+      }
+    };
+  }
+
 
   @Override
   public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {

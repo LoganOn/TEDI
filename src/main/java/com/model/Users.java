@@ -1,11 +1,9 @@
 package com.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -14,6 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 public class Users {
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "UserId")
@@ -59,6 +58,7 @@ public class Users {
     this.phone = phone;
     this.role = role;
   }
+
 //  @OneToMany(mappedBy = "user", orphanRemoval = true)
 //  @JsonManagedReference
 //  private List<DeliveryOrders> deliveryOrdersList;
