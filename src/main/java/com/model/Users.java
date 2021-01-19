@@ -58,6 +58,7 @@ public class Users {
     this.phone = phone;
     this.role = role;
   }
+
 //  @OneToMany(mappedBy = "user", orphanRemoval = true)
 //  @JsonManagedReference
 //  private List<DeliveryOrders> deliveryOrdersList;
