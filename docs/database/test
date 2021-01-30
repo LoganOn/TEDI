@@ -1,0 +1,1759 @@
+USE [SBO_Femax]
+GO
+/****** Object:  StoredProcedure [dbo].[_XYZPR_Kreator_CentralaV6]    Script Date: 30-01-2021 14:49:37 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+/*
+exec [_XYZPR_Kreator_CentralaV6] '19000101','19000101','','D0000069','GD HANDL','4','%', 10
+*/
+
+ALTER PROCEDURE [dbo].[_XYZPR_Kreator_CentralaV6]
+(@dataodin datetime,
+@datadoin datetime,
+@prodin nvarchar(20),
+@dostawcain nvarchar(20),
+@magazynin nvarchar(20),
+@opcjain nvarchar(20),
+@grupain nvarchar(5),
+@cykl int
+)
+
+as
+begin
+--SET ARITHABORT ON;
+--set transaction isolation level read uncommitted;
+--set ansi_nulls on;
+--set ansi_warnings on;
+--set xact_abort on;
+declare @magtrans nvarchar(20)
+declare @dataod datetime
+declare @datado datetime
+declare @prod nvarchar(20)
+declare @dostawca nvarchar(20)
+declare @magazyn nvarchar(20)
+declare @opcja nvarchar(20)
+declare @grupa nvarchar(5)
+declare @wydluzenieCyklu int
+
+
+set @datado=@datadoin
+set @datado=@datadoin
+set @prod=@prodin
+set @dostawca=@dostawcain
+set @magazyn=@magazynin
+set @opcja=@opcjain
+set @grupa=@grupain
+set @magtrans=left(@magazyn,2)+' TRANS'
+set @wydluzenieCyklu = ISNULL(@cykl,0)
+IF @magazyn='GD1 HAND' set @magtrans='GD1 TRAN'
+	--set @prod=(select case when trim(isnull(@prod,''))='' then '%' else @prod end)
+	set @prod=(select case when RTRIM(LTRIM(isnull(@prod,'')))='' then '%' else @prod end)
+	set @dostawca=(select case when len(isnull(@dostawca,''))<=1 then '%' else @dostawca end)
+	set @grupa=(select case when len(isnull(@grupa,''))<=1 then '%' else @grupa end)
+DECLARE @WSKMED numeric(10,4)
+DECLARE @WSKMED1 numeric(10,4)
+DECLARE @PROG_WT numeric(10,4)
+DECLARE @TYP_ALG nvarchar(10)
+DECLARE @WSK_DNI numeric(10,4)
+DECLARE @PROG_ZER numeric(10,4)
+DECLARE @PROG_WAR numeric(10,4)
+
+set @WSKMED=(select U_WSK_MED from [dbo].[@MRP_ALGORYTMY] where Code=@opcja)
+set @WSKMED1=(select U_MnMin2 from [dbo].[@MRP_ALGORYTMY] where Code=@opcja)  -- do zmiany w tabeli na U_WSK_MED2
+set @PROG_WT=(select U_Prog_Tran from [dbo].[@MRP_ALGORYTMY] where Code=@opcja)
+set @TYP_ALG=(select U_Typ_Alg from [dbo].[@MRP_ALGORYTMY] where Code=@opcja)
+set @WSK_DNI=(select U_WSK_DNI from [dbo].[@MRP_ALGORYTMY] where Code=@opcja)
+set @PROG_ZER=(select U_Prog_Zer from [dbo].[@MRP_ALGORYTMY] where Code=@opcja)
+set @PROG_WAR=(select U_Prog_War from [dbo].[@MRP_ALGORYTMY] where Code=@opcja)
+
+IF OBJECT_ID('tempdb..#Items') IS NOT NULL
+    DROP TABLE #Items
+	CREATE TABLE #Items
+		(
+			ItemCode nvarchar(100) collate SQL_Latin1_General_CP850_CI_AS,
+			ItemName nvarchar(254),
+			U_NrKatDost nvarchar(100),
+			Iscommited int,
+			Onhand int,
+			onorder int,
+			SWeight1 numeric(10,2),
+			SVolume numeric(10,2),
+			U_Sezonowosc numeric(10,2),
+			u_WR1 numeric(10,2),
+			u_WR2 numeric(10,2),
+			U_StatusPozycji int ,
+			U_Mediana numeric(10,2),
+			qrygroup29 nvarchar(1),
+			WR1 numeric(10,4),
+			WR1Logis numeric(10,4),
+			WR2 numeric(10,4),
+			WR2Logis numeric(10,4),
+			IloscNaWZ numeric(10,2),
+			IloscNaWZLogis numeric(10,2),
+			IloscWZ int,
+			IloscWzLogis int
+		)
+INSERT INTO #Items
+SELECT T0.ItemCode
+,t0.ItemName
+,t0.U_NrKatDost
+,t1.Iscommited
+,t1.Onhand
+,t1.onorder
+,t0.SWeight1
+,t0.SVolume
+,t0.U_Sezonowosc
+,t1.U_WR1
+,t1.U_WR2
+,t1.U_StatusPozycji
+,t0.U_Mediana
+,t0.qrygroup29
+,t3.WR1
+,t3logis.WR1
+,t3.WR2
+,t3logis.WR2
+,t3.IloscNaWZ
+,t3logis.IloscNaWZ
+,t3.iloscWZ
+,t3logis.iloscWZ
+FROM OITM t0
+inner join oitw t1 with (nolock) on t1.ItemCode=t0.ItemCode and t1.WhsCode=@magazyn
+inner join [dbo].[@MRP_ALGORYTMY] t2 on t2.code=@opcja
+inner join [dbo].[_ALT_ACTIVE_ITEMS] t12 on t12.ItemCode=t0.ItemCode
+left join [dbo].[_XYZFN_Kreator_Centrala_WR_ALL_Mnoznik_ZliczanieWZ](@magazyn,@WSKMED,@WSKMED1, @dostawca, @PROG_WT) t3 on t3.itemcode=t0.ItemCode
+left join [dbo].[_XYZFN_Kreator_Centrala_WR_ALL_Mnoznik_ZliczanieWZ] ('LO HANDL',@WSKMED,@WSKMED1, @dostawca, @PROG_WT) t3logis on t3logis.itemcode=t0.ItemCode
+/*left join
+	(
+		select itemcode,sum(onorder) as ZD from OITW with (nolock) where whscode in (@magazyn,@magtrans)
+		group by itemcode
+	)t4 on t4.itemcode=t0.itemcode*/
+WHERE t1.WhsCode=@magazyn and t12.validFor='Y'
+and '{'+cast(t0.FirmCode as nvarchar(5))+'}' like '%{'+@prod+'}%'
+and '{'+cast(t0.ItmsGrpCod as nvarchar(5))+'}' like '%{'+@grupa+'}%'
+and t0.CardCode like '%'+@dostawca+'%'
+and t0.QryGroup30 <>'Y'
+--and (isnull(t0.Iscommited,0))+  isnull((t1.U_WR1),0)*(1+((isnull(t0.U_Sezonowosc,0)/100.00) * t2.U_WSK_SEZ)) * t2.U_ZAKR_MIN - t4.ZD - >0
+
+IF OBJECT_ID('tempdb..#wynik') IS NOT NULL
+    DROP TABLE #wynik
+create table #wynik
+	(
+	ItemCode nvarchar(200) collate SQL_Latin1_General_CP850_CI_AS
+	,ItemName nvarchar(200)
+	,NrKat nvarchar(100)
+	,ZS numeric(10,2)
+	,ZSL numeric(10,2)
+	,ZD numeric(10,2)
+	,ZDL numeric(10,2)
+	,IM numeric(10,2)
+	,[IO] numeric(10,2)
+	,[IG] numeric(10,2)
+	,[IL] numeric(10,2)
+	,[IO2] numeric(10,2)
+	,WZ numeric(10,2)
+	,BRAKI numeric(10,2)
+	,INW numeric (10,2)
+	,WAGA numeric(20,3)
+	,OBJETOSC numeric(20,3)
+	,WR1 numeric(10,4)
+	,WR1Kart numeric(10,4)
+	,WR2 numeric(10,4)
+	,WR2Kart numeric(10,4)
+	,WSK_SEZ int
+	,WR1LICZ numeric(10,4)
+	,WR2LICZ numeric(10,4)
+	,SP int
+	,T1 int
+	,OPCJA nvarchar(30)
+	,ZM numeric(10,2)
+	,WR2_A int
+	,WR2_B int
+	,WR2_C int
+	,WR2_D int
+	,WSK_MIN numeric(10,4)
+	,ZAKR_MIN numeric(10,2)
+	,ZAKR_MAX numeric(10,2)
+	,ZAKR_MAX2 numeric(10,2)
+	,TRANS numeric(10,2)
+	,TRANSLOGIS numeric(10,2)
+	,MEDIANA numeric(10,2)
+	,MINIMUM numeric(10,2)
+	,ZMR numeric(10,2)
+	,ZMM numeric(10,2)
+	,test1 numeric(10,2)
+	,test2 numeric(10,2)
+	,test3 numeric(10,2)
+	,QryGroup29 nvarchar(1)
+	,SumaRotacji numeric(10,2)
+	,WD1 numeric(10,2)
+	,WD2 numeric(10,2)
+	,LastPrice numeric(10,2)
+	,GroupName nvarchar(100)
+	,IloscZS int
+	)
+
+insert into #wynik
+SELECT
+t0.ItemCode ItemCode
+,replace(t0.ItemName,'"','') ItemName
+,t0.U_NrKatDost NrKat
+,isnull(t0.Iscommited,0)+ isnull(t15.ZD_OF,0) ZS
+,(select isnull(Iscommited,0) FROM OITW with (nolock) where ItemCode=t0.ItemCode and WhsCode='LO HANDL') ZSL
+,t4.ZD  as 'ZD'
+,case when @magazyn = 'GD HANDL' then  t14.OnOrderLOGIS else 0 end as 'ZDL'
+,isnull(t0.Onhand,0) as 'IM'
+,t6.[IO] as 'IO'
+,t7.IG as 'IG'
+,t14.IMLOGIS as  'IL'
+,t8.IO2
+,case when @magazyn = 'GD HANDL' then isnull(t0.IloscNaWZ,0) + isnull(t0.IloscNaWZLogis,0) else isnull(t0.IloscNaWZ,0) end as 'WZ'
+,t9.BRAKI
+,t11.INW
+,isnull(t0.SWeight1,0.000)
+,isnull(t0.SVolume/1000,0.000)
+,isnull((t0.WR1),0)*(1+((isnull(t0.U_Sezonowosc,0)/100.00) * t2.U_WSK_SEZ)) WR1
+,isnull(t0.u_WR1,0) WR1Kart
+,(isnull((t0.WR2),0)/isnull(case when (t0.WR1)= 0 then 1 else (t0.WR1) end ,1))*(isnull((t0.WR1),0)*(1+((isnull(t0.U_Sezonowosc,0)/100.00) * t2.U_WSK_SEZ))) WR2
+,isnull(t0.u_wr2,0) WR2Kart
+,cast(isnull(t0.U_Sezonowosc,0) as int)
+,isnull((t0.WR1/30),0)*(1+((isnull(t0.U_Sezonowosc,0)/100.00) * t2.U_WSK_SEZ)) WR1LICZ
+,(isnull((t0.WR2/30),0)/isnull(case when (t0.WR1/30)= 0 then 1 else (t0.WR1/30) end ,1))*(isnull((t0.WR1/30),0)*(1+((isnull(t0.U_Sezonowosc,0)/100.00) * t2.U_WSK_SEZ))) WR2LICZ
+,isnull(cast(isnull(t0.U_StatusPozycji,0) as int),0)
+,@wydluzenieCyklu
+--,isnull((select U_OkresT1  from ocrd where cardcode=@dostawca),0)
+,t2.name
+,isnull(
+		((isnull(t0.WR1,0)*(1+((isnull(t0.U_Sezonowosc,0)/100.00) * t2.U_WSK_SEZ)))/100.00)*isnull((select isnull(U_OkresT1,0) from ocrd where cardcode=@dostawca),0)
+		+isnull(t0.Iscommited,0)-(isnull(t0.Onhand,0))-(isnull(t0.onorder,0))
+		+case when @magazyn='GD HANDL' then (isnull(t14.IsCommitedLOGIS,0)) - (isnull(IMLOGIS,0))- (isnull(OnOrderLOGIS,0)) else 0 end
+	,0) as ZAM
+,isnull(t2.U_WR2_A,0)
+,isnull(T2.U_WR2_B,0)
+,isnull(t2.U_WR2_C,0)
+,isnull(t2.U_WR2_D,0)
+,isnull(t2.U_WSK_MIN,0)WSK_MIN
+,isnull(t2.U_ZAKR_MIN,0)ZAKR_MIN
+,isnull(t2.U_ZAKR_MAX,0)ZAKR_MAX
+,isnull(t2.U_ZAKR_MAX2,0) as ZAKR_MAX2
+,isnull(t5.IM,0)as TRANS
+,isnull(t10.IML,0)as TRANSLOGIS
+,case when isnull(t0.U_Mediana,0)<1 then 1 else t0.U_Mediana end  MEDIANA
+,isnull(t0.U_Mediana*t2.U_MnMin,0) MINIMUM
+,0 as ZMR
+,0 as ZMM
+,t0.U_Mediana
+,t2.U_MnMin test2
+,t14.OnOrderLOGIS
+,t0.qrygroup29
+,t20.wr1
+,null as WD1
+,null as WD2
+,t1.LastPurPrc
+,t3.ItmsGrpNam
+,(select COUNT(distinct DocEntry) from rdr1  where LineStatus = 'O' and ItemCode = t0.ItemCode)
+FROM #Items t0
+inner join oitm t1 on t0.itemcode=t1.itemcode collate polish_ci_as
+inner join [dbo].[@MRP_ALGORYTMY] t2 on t2.code=@opcja
+inner join oitb t3 on t3.ItmsGrpCod = t1.ItmsGrpCod
+left join
+	(
+		select itemcode,sum(onorder) as ZD from OITW with (nolock) where whscode in (@magazyn,@magtrans)
+		group by itemcode
+	)t4 on t4.itemcode=t0.itemcode
+left  join
+	(
+		select ItemCode,a1.whscode,sum(OpenQty)ZD_OF
+		from OQUT A0
+		inner join QUT1 A1 on A0.DocEntry=A1.DocEntry
+		Where a0.DocStatus='O'
+		and u_rodzaj='ZL1'
+		and WhsCode='GD HANDL'
+		group by ItemCode,whscode
+	)t15 on t15.itemcode=t0.itemcode and t15.WhsCode=@magazyn
+left  join
+	(
+		select itemcode,sum(onhand) as IM from OITW with (nolock)
+		where whscode in (@magtrans)
+		group by itemcode
+	) t5 on t5.itemcode=t0.itemcode
+left join
+		(
+		select itemcode,sum(onhand) as IML from OITW with (nolock)
+		where whscode in ('LO TRANS')
+		group by itemcode
+	) t10 on t10.itemcode=t0.itemcode
+left  join
+	(
+		select itemcode,sum(onhand) as IMLOGIS,sum(onorder) OnOrderLOGIS,sum(iscommited)IsCommitedLOGIS from OITW with (nolock)
+		where whscode='LO HANDL'
+		group by itemcode
+	) t14 on t14.itemcode=t0.itemcode
+left  join
+	(
+		select itemcode,sum(ilosc) as 'IO'
+		FROM(
+		select itemcode,case when (sum(isnull(Onhand,0)))<0 then 0 else sum(isnull(Onhand,0)) end ilosc
+		from oitw with (nolock)
+		where whscode like '%Hand%' and whscode not in ('GD HANDL' ,'LO HANDL')
+		group by itemcode)A
+		GROUP BY ITEMCODE
+
+	)t6 on t6.itemcode=t0.itemcode
+left  join
+	(
+		select itemcode,sum(ilosc) as 'IG'
+		FROM(
+		select itemcode,case when (sum(isnull(Onhand,0)))<0 then 0 else sum(isnull(Onhand,0)) end ilosc
+		from oitw with (nolock)
+		where whscode='GD HANDL'
+		group by itemcode)A
+		GROUP BY ITEMCODE
+
+	)t7 on t7.itemcode=t0.itemcode
+left  join
+	(
+		SELECT itemcode,sum(onhand)-sum(iscommited) as 'IO2'
+		FROM
+			(
+				select itemcode,sum(onhand)onhand,sum(IsCommited) iscommited
+				from oitw with (nolock)
+				where isnull(U_StatusPozycji,0)=0 and (WhsCode not like 'GD%' and WhsCode not like 'LO%') and (whscode like '%HANDL%' or whscode like '%INWES%')
+				group by itemcode,left(whscode,2)
+				having sum(onhand)>sum(IsCommited)
+			)A0
+		Group by Itemcode
+		having sum(onhand)>sum(IsCommited)
+	)t8 on t8.itemcode=t0.ItemCode
+left  join
+	(
+		select itemcode,sum(ilosc) as 'BRAKI'
+		FROM(
+		select itemcode,case when (sum(isnull(Onhand,0)))<0 then 0 else sum(isnull(Onhand,0)) end ilosc
+		from oitw with (nolock)
+		where whscode in ('GD BRAKI' ,'LO BRAKI')
+		group by itemcode)A
+		GROUP BY ITEMCODE
+	)t9 on t9.itemcode=t0.ItemCode
+	left  join
+	(
+		select itemcode,sum(onhand)-sum(iscommited) as 'INW'
+		FROM(
+		select itemcode,sum(onhand)onhand,sum(IsCommited) iscommited
+		from oitw with (nolock)
+		where whscode like '%INWE%'
+		group by itemcode)A
+		GROUP BY ITEMCODE
+	)t11 on t11.itemcode=t0.ItemCode
+left join
+	(
+		select  itemcode,sum(isnull(u_wr1,0))wr1,sum(isnull(u_wr2 ,0))wr2
+		from OITW
+		where charindex('HAND',WhsCode)>1
+		and (U_WR1<>0 or U_WR2<>0)
+		group by ItemCode
+	) t20 on t20.ItemCode=t0.ItemCode
+OPTION(RECOMPILE)
+
+IF @magazyn<>'GD HANDL'
+	BEGIN
+	update #wynik set ZSL=0
+	END
+
+update #wynik set
+T1 = CASE
+WHEN WR2LICZ>ZAKR_MAX --r2(a/b)
+THEN
+	CASE WHEN SP=1
+	THEN
+		WR2_A+T1
+	ELSE
+	null
+	END
+
+WHEN WR2LICZ<=ZAKR_MAX /*r2(a/b)*/ AND WR2LICZ>ZAKR_MIN /*r2 (b/c) */
+THEN
+	CASE WHEN SP=1
+	THEN
+		WR2_B+T1
+	ELSE
+	null
+	END
+WHEN WR2LICZ<=ZAKR_MIN /*r2 (b/c) */ AND WR2LICZ>ZAKR_MAX2 /*r2 (d/c) */
+THEN
+	CASE WHEN SP=1
+	THEN
+		WR2_C+T1
+	ELSE
+	null
+	END
+WHEN WR2LICZ<=ZAKR_MAX2 /*r2 (d/c) */
+THEN
+	CASE WHEN SP=1
+	THEN
+		WR2_D+T1
+	ELSE
+	null
+	END
+END
+
+--delete from  #wynik where  (ZS+(WSK_MIN*WR1)-isnull(IM,0)-isnull(ZD,0))>0
+
+
+update #wynik set
+ZM=
+CASE
+WHEN WR2LICZ>ZAKR_MAX
+THEN
+	CASE WHEN SP=1
+	THEN
+		CASE WHEN (ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL)-cast((ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL) as numeric(10,2))=0
+		THEN
+		(ceiling(WR1LICZ*(T1)))+ZS+ZSL-IM-ZD-ZDL
+		ELSE
+		cast((ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL)as numeric(10,2))+1
+		END
+	ELSE
+	ZS+ZSL-IM-ZD-ZDL
+	END
+
+WHEN WR2LICZ<=ZAKR_MAX /*r2(a/b)*/ AND WR2LICZ>ZAKR_MIN /*r2 (b/c) */
+THEN
+	CASE WHEN SP=1
+	THEN
+		CASE WHEN (ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL)-cast((ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL) as numeric(10,2))=0
+		THEN
+		(ceiling(WR1LICZ*(T1)))+ZS+ZSL-IM-ZD-ZDL
+		ELSE
+		cast((ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL)as numeric(10,2))+1
+		END
+	ELSE
+	ZS+ZSL-IM-ZD-ZDL
+	END
+WHEN WR2LICZ<=ZAKR_MIN /*r2 (b/c) */ AND WR2LICZ>ZAKR_MAX2 /*r2 (d/c) */
+THEN
+	CASE WHEN SP=1
+	THEN
+		CASE WHEN (ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL)-cast((ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL) as int)=0
+		THEN
+		ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL
+		ELSE
+		cast((ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL)as int)+1
+		END
+	ELSE
+	ZS+ZSL-IM-ZD-ZDL
+	END
+WHEN WR2LICZ<=ZAKR_MAX2 /*r2 (d/c) */
+THEN
+	CASE WHEN SP=1
+	THEN
+		CASE WHEN (ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL)-cast((ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL) as int)=0
+		THEN
+		ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL
+		ELSE
+		cast((ceiling(WR1LICZ*(T1))+ZS+ZSL-IM-ZD-ZDL)as int)+1
+		END
+	ELSE
+	ZS+ZSL-IM-ZD-ZDL
+	END
+
+END
+
+
+UPDATE #wynik set
+ZM=case when (isnull(IM,0)+isnull(ZD,0)+isnull(ZDL,0)) + isnull(TRANS,0) + case when @magazyn like 'GD HANDL' then (isnull(IL,0))  + isnull(TRANSLOGIS,0) else 0  end <(WSK_MIN*WR1LICZ)+ZS+ZSL
+THEN
+	ZM
+ELSE
+	0
+END
+
+--delete from #wynik where ZM<=0
+
+update #wynik set Wr1LICZ=0 where wr1LICZ<0
+update #wynik set Wr1=0 where wr1<0
+update #wynik set ZM=ZM - isnull(TRANS,0) - case when @magazyn like 'GD HANDL' then isnull(IL,0) + isnull(TRANSLOGIS,0) else 0 end
+update #wynik set ZMR=ZM
+update #wynik set ZMM=ZS+ZSL+MINIMUM-ZD-ZDL-IM - isnull(TRANS,0) - case when @magazyn like 'GD HANDL' then isnull(IL,0) + isnull(TRANSLOGIS,0) else 0 end where SP=1 and WR1LICZ > 0
+update #wynik set ZMM=ZM where SP=0
+update #wynik set ZMR=0 where ZMR<0
+update #wynik set ZMM=ceiling(ZMM) where SP=1
+update #wynik set ZMM=0 where ZMM<0
+delete from #wynik where ZM<=0
+update #wynik set ZM=cast(case when ZMM>=ZMR then ZMM else ZMR end  as numeric(10,2))
+update #wynik set WD2 = Case when ((ZM * LastPrice) < @PROG_WAR)  and SP = 1 then (ceiling(WR1LICZ*(T1 * (1 + @WSK_DNI))+ ZS + ZSL - IM - ZD - ZDL)) else WD2 end
+update #wynik set WD1 = 0 where ZM < ((IM - ZS + ZD) * @PROG_ZER / 100) and SP = 1
+
+IF  @opcja in (16,17)--do zmiany w przyszłosci
+BEGIN
+SELECT
+	NULL 'Indeks$ItemCode'
+	,NULL'Opis$ItemName'
+	,NULL 'NrKat$NrKat'
+	,NULL 'Grp_Mat$GroupName'
+	,NULL 'ZS$ZS'
+	,NULL 'ZSL$ZSL'
+	,NULL 'ZD$ZD'
+	,NULL 'ZDL$ZDL'
+	,NULL'IM$IM'
+	,NULL 'IG$IG'
+	,NULL 'IL$IL'
+	,NULL 'IO$IO'
+	,NULL 'TRANS$TRANS'
+	,NULL 'BRAKI$BRAKI'
+	,NULL 'INW$INW'
+	,NULL 'WZ$WZ'
+	,NULL 'WR1$WR1M'
+	,NULL 'WR2$WR2M'
+	,NULL '%$Sez'
+	,NULL 'Status$Status'
+	,NULL 'T$T1'
+	,0 as 'ZM$Quantity'
+	,NULL 'ZMR$ZMR'
+	,NULL 'ZMM$ZMM'
+	,NULL 'WD1$WD1'
+	,NULL 'WD2$WD2'
+	,NULL as 'CZ$lastprice'
+	,NULL N'Wartość$purvalue'
+	,NULL N'Korekta$purvalue_TEST'
+	,NULL 'WR1kart$WR1kart'
+	,NULL 'WR2kart$WR2kart'
+	,NULL 'WAGALICZ$WAGALICZ'
+	,NULL 'WAGA$WAGA'
+	,NULL 'OBJETOSCLICZ$OBJETOSCLICZ'
+	,NULL 'OBJETOSC$OBJETOSC'
+	,NULL 'WR1D$WR1'
+	,NULL 'WR2D$WR2'
+	,NULL 'SumaRotacji'
+	,NULL as '$COLOR'
+,  N'
+  <cols>
+    <col id="ItemCode"
+      width="200"
+      linkedobject="4"
+	  sort="true"
+    />
+    <col id="ItemName"
+      width="250"
+	  sort="true"
+    />
+	 <col id="NrKat"
+      width="100"
+	  sort="true"
+    />
+	 <col id="GroupName"
+      width="100"
+	  sort="true"
+    />
+    <col id="ZS"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="11730879"
+    />
+	<col id="ZSL"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="11730879"
+    />
+	<col id="ZD"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="12713980"
+    />
+	<col id="ZDL"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="12713980"
+    />
+	<col id="IM"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="1875436"
+    />
+	<col id="IG"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="IL"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="IO"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="TRANS"
+      width="55"
+      type="2"
+	  color="12713980"
+    />
+	<col id="BRAKI"
+      width="55"
+      type="2"
+	  color="12713980"
+    />
+	<col id="INW"
+      width="55"
+      type="2"
+	  color="12713980"
+    />
+	<col id="WZ"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="WAGALICZ"
+      width="0"
+      type="2"
+    />
+	<col id="WAGA"
+      width="70"
+      type="2"
+	  sort="true"
+      sum="true"
+	  algorithm = "WAGALICZ * Quantity"
+    />
+	<col id="OBJETOSCLICZ"
+      width="0"
+      type="2"
+    />
+	<col id="OBJETOSC"
+      width="70"
+      type="2"
+	  sort="true"
+      sum="true"
+	  algorithm = "OBJETOSCLICZ * Quantity"
+    />
+	<col id="WR1"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR2"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR1M"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR2M"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="Sez"
+      width="40"
+	  type="2"
+	  sort="true"
+    />
+	<col id="Status"
+      width="40"
+	  type="2"
+	  sort="true"
+    />
+	<col id="T"
+      width="50"
+	  type="2"
+	  sort="true"
+    />
+    <col id="Algorytm"
+      width="100"
+      type="0"
+	  sort="true"
+    />
+    <col id="Quantity"
+      width="50"
+      type="2"
+      edit="true"
+      sum="true"
+	  sort="true"
+	  color="12713980"
+    />
+    <col id="lastprice"
+      width="60"
+      type="2"
+	  sort="true"
+    />
+    <col id="purvalue"
+      width="100"
+      type="2"
+      sum="true"
+	  sort="true"
+      algorithm = "lastprice * Quantity"
+    />
+	<col id="purvalue_TEST"
+      width="100"
+      type="2"
+      sum="true"
+	  sort="true"
+	  color="12713980"
+    />
+    <col id="Comments"
+      width="0"
+      edit="true"
+	  sort="true"
+    />
+	 <col id="ZMM"
+      width="50"
+      type="2"
+      sort="true"
+    />
+	<col id="WR1Kart"
+      width="70"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR2Kart"
+      width="70"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WD1"
+      width="50"
+      type="2"
+      sort="true"
+	  color="12713980"
+    />
+	<col id="WD2"
+      width="50"
+      type="2"
+      sort="true"
+	  color="12713980"
+    />
+	 <col id="ZMR"
+      width="50"
+      type="2"
+      sort="true"
+    />
+  </cols>
+  ' as '$XMLFORMAT'
+union all
+SELECT
+	t0.ItemCode 'Indeks$ItemCode'
+	,t0.ItemName 'Opis$ItemName'
+	,NrKat 'NrKat$NrKat'
+	,GroupName 'Grp_Mat$GroupName'
+	,ZS 'ZS$ZS'
+	,ZSL 'ZSL$ZSL'
+	,ZD 'ZD$ZD'
+	,ZDL 'ZDL$ZDL'
+	,case when @magazyn = 'GD HANDL' then  IG + IL + TRANS + TRANSLOGIS else IM end as 'IM$IM'
+	,[IG] 'IG$IG'
+	,[IL] 'IL$IL'
+	,[IO] 'IO$IO'
+	,TRANS + TRANSLOGIS'TRANS$TRANS'
+	,BRAKI 'BRAKI$BRAKI'
+	,INW 'INW$INW'
+	,[WZ] 'WZ$WZ'
+	,cast(t0.WR1 as numeric(10,2)) 'WR1$WR1M'
+	,cast(t0.WR2 as numeric(10,1)) 'WR2$WR2M'
+	,WSK_SEZ '%$Sez'
+	,SP 'Status$Status'
+	,T1 'T$T1'
+	,ZM as 'ZM$Quantity'
+	,ZMR 'ZMR$ZMR'
+	,ZMM 'ZMM$ZMM'
+	,ceiling(WD1) 'WD1$WD1'
+	,ceiling(WD2) 'WD2$WD2'
+	,LastPrice as 'CZ$lastprice'
+	,round(ZM*LastPrice,2) N'Wartość$purvalue'
+	,case when isnull(WD1,100) = 100 then round((WD2 - ZM)* LastPrice,2) else round((WD1 - ZM)*LastPrice,2) end N'Wartość$purvalue_TEST'
+	,cast(WR1Kart as numeric(10,2)) 'WR1kart$WR1kart'
+	,cast(WR2Kart as numeric(10,1)) 'WR2kart$WR2kart'
+	,WAGA 'WAGALICZ$WAGALICZ'
+	,WAGA*ZM 'WAGA$WAGA'
+	,OBJETOSC 'OBJETOSCLICZ$OBJETOSCLICZ'
+	,OBJETOSC*ZM 'OBJETOSC$OBJETOSC'
+	,WR1LICZ 'WR1D$WR1'
+	,WR2LICZ 'WR2D$WR2'
+	,SumaRotacji
+/*
+16777215 - FFFFFF - biały
+8650608 - 83FF70 - Zielony
+16760820 - FFBFF4 -Fiolet
+16711680 -czerwony
+12714480 - indygo
+*/
+,CASE WHEN t1.QRYGROUP29='Y' and @TYP_ALG not in ('Log','Od') THEN 255
+ELSE
+CASE WHEN  @magazyn like '%GD%HAND%' and @opcja<>2 and
+	(
+		[IO2]>1 and isnull(SP,0)=0
+	)
+THEN 16760820
+ELSE
+	case when INW > 0 then 12705900
+	when isnull(SP,0)=0
+	THEN
+		CASE WHEN isnull(t2.IloscWZ,0) + IloscZS > 4
+		THEN
+		8650608 --zielony
+		ELSE
+		16777215 --biały
+		END
+	ELSE
+		CASE WHEN isnull(t2.IloscWZ,0) + IloscZS < 4
+		THEN
+		16746854 --niebieski
+		ELSE
+		16777215 --biały
+		END
+	END
+END
+END as '$COLOR'
+
+,  N'
+  <cols>
+    <col id="ItemCode"
+      width="200"
+      linkedobject="4"
+	  sort="true"
+    />
+    <col id="ItemName"
+      width="250"
+	  sort="true"
+    />
+	 <col id="NrKat"
+      width="100"
+	  sort="true"
+    />
+	<col id="GroupName"
+      width="100"
+	  sort="true"
+    />
+    <col id="ZS"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="11730879"
+    />
+	<col id="ZSL"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="11730879"
+    />
+	<col id="ZD"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="12713980"
+    />
+	<col id="ZDL"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="12713980"
+    />
+	<col id="IM"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="1875436"
+    />
+	<col id="IG"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="IL"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="IO"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="TRANS"
+      width="55"
+      type="2"
+	  color="12713980"
+    />
+	<col id="BRAKI"
+      width="55"
+      type="2"
+	  color="12713980"
+    />
+	<col id="INW"
+      width="55"
+      type="2"
+	  color="12713980"
+    />
+	<col id="WZ"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="WAGALICZ"
+      width="0"
+      type="2"
+    />
+	<col id="WAGA"
+      width="70"
+      type="2"
+	  sort="true"
+      sum="true"
+	  algorithm = "WAGALICZ * Quantity"
+    />
+	<col id="OBJETOSCLICZ"
+      width="0"
+      type="2"
+    />
+	<col id="OBJETOSC"
+      width="70"
+      type="2"
+	  sort="true"
+      sum="true"
+	  algorithm = "OBJETOSCLICZ * Quantity"
+    />
+	<col id="WR1"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR2"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR1M"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR2M"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="Sez"
+	  type="2"
+      width="40"
+	  sort="true"
+    />
+	<col id="Status"
+	  type="2"
+      width="40"
+	  sort="true"
+    />
+	<col id="T"
+      width="50"
+	  sort="true"
+    />
+    <col id="Algorytm"
+      width="100"
+      type="0"
+	  sort="true"
+    />
+    <col id="Quantity"
+      width="50"
+      type="2"
+      edit="true"
+      sum="true"
+	  sort="true"
+	  color="12713980"
+    />
+    <col id="lastprice"
+      width="60"
+      type="2"
+	  sort="true"
+    />
+    <col id="purvalue"
+      width="100"
+      type="2"
+      sum="true"
+	  sort="true"
+      algorithm = "lastprice * Quantity"
+    />
+	<col id="purvalue_TEST"
+      width="100"
+      type="2"
+      sum="true"
+	  sort="true"
+	  color="12713980"
+    />
+    <col id="Comments"
+      width="0"
+      edit="true"
+	  sort="true"
+    />
+	 <col id="ZMM"
+      width="50"
+      type="2"
+      sort="true"
+    />
+	<col id="WR1Kart"
+      width="70"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR2Kart"
+      width="70"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	 <col id="WD1"
+      width="50"
+      type="2"
+      sort="true"
+	  color="12713980"
+    />
+	<col id="WD2"
+      width="50"
+      type="2"
+      sort="true"
+	  color="12713980"
+    />
+	 <col id="ZMR"
+      width="50"
+      type="2"
+      sort="true"
+    />
+  </cols>
+  ' as '$XMLFORMAT'
+FROM #wynik t0
+inner join oitm t1 on t0.itemcode=t1.itemcode collate polish_ci_as
+inner join #Items t2 on t0.ItemCode = t2.ItemCode
+END
+/* TO DO */
+ELSE IF @magazyn like 'GD HANDL' and @opcja not in (16, 17)  --do zmiany w przyszłosci
+BEGIN
+SELECT
+	NULL 'Indeks$ItemCode'
+	,NULL'Opis$ItemName'
+	,NULL 'NrKat$NrKat'
+	,NULL 'Grp_Mat$GroupName'
+	,NULL 'ZS$ZS'
+	,NULL 'ZSL$ZSL'
+	,NULL 'ZD$ZD'
+	,NULL 'ZDL$ZDL'
+	,NULL'IM$IM'
+	,NULL 'IG$IG'
+	,NULL 'IL$IL'
+	,NULL 'IO$IO'
+	,NULL 'TRANS$TRANS'
+	,NULL 'BRAKI$BRAKI'
+	,NULL 'INW$INW'
+	,NULL 'WZ$WZ'
+	,NULL 'WR1$WR1M'
+	,NULL 'WR2$WR2M'
+	,NULL '%$Sez'
+	,NULL 'Status$Status'
+	,NULL 'T$T1'
+	,0 as 'ZM$Quantity'
+	,NULL 'ZMR$ZMR'
+	,NULL 'ZMM$ZMM'
+	,NULL as 'CZ$lastprice'
+	,NULL N'Wartość$purvalue'
+	,NULL 'WAGALICZ$WAGALICZ'
+	,NULL 'WAGA$WAGA'
+	,NULL 'OBJETOSCLICZ$OBJETOSCLICZ'
+	,NULL 'OBJETOSC$OBJETOSC'
+	,NULL 'WR1kart$WR1kart'
+	,NULL 'WR2kart$WR2kart'
+	,NULL 'SumaRotacji'
+	,NULL as '$COLOR'
+,  N'
+  <cols>
+    <col id="ItemCode"
+      width="200"
+      linkedobject="4"
+	  sort="true"
+    />
+    <col id="ItemName"
+      width="250"
+	  sort="true"
+    />
+	 <col id="NrKat"
+      width="100"
+	  sort="true"
+    />
+	<col id="GroupName"
+      width="100"
+	  sort="true"
+    />
+    <col id="ZS"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="11730879"
+    />
+	<col id="ZSL"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="11730879"
+    />
+	<col id="ZD"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="12713980"
+    />
+	<col id="ZDL"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="12713980"
+    />
+	<col id="IM"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="1875436"
+    />
+	<col id="IG"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="IL"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="IO"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="TRANS"
+      width="55"
+      type="2"
+	  color="12713980"
+    />
+	<col id="BRAKI"
+      width="55"
+      type="2"
+	  color="12713980"
+    />
+	<col id="INW"
+      width="55"
+      type="2"
+	  color="12713980"
+    />
+	<col id="WZ"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="WAGALICZ"
+      width="0"
+      type="2"
+    />
+	<col id="WAGA"
+      width="70"
+      type="2"
+	  sort="true"
+      sum="true"
+	  algorithm = "WAGALICZ * Quantity"
+    />
+	<col id="OBJETOSCLICZ"
+      width="0"
+      type="2"
+    />
+	<col id="OBJETOSC"
+      width="70"
+      type="2"
+	  sort="true"
+      sum="true"
+	  algorithm = "OBJETOSCLICZ * Quantity"
+    />
+	<col id="WR1kart"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR2kart"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR1M"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR2M"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="Sez"
+      width="40"
+	  type="2"
+	  sort="true"
+    />
+	<col id="Status"
+      width="40"
+	  type="2"
+	  sort="true"
+    />
+	<col id="T"
+	  type="2"
+      width="50"
+	  sort="true"
+    />
+    <col id="Algorytm"
+      width="100"
+      type="0"
+	  sort="true"
+    />
+    <col id="Quantity"
+      width="50"
+      type="2"
+      edit="true"
+      sum="true"
+	  sort="true"
+	  color="12713980"
+    />
+    <col id="lastprice"
+      width="60"
+      type="2"
+	  sort="true"
+    />
+    <col id="purvalue"
+      width="100"
+      type="2"
+      sum="true"
+	  sort="true"
+      algorithm = "lastprice * Quantity"
+    />
+    <col id="Comments"
+      width="0"
+      edit="true"
+	  sort="true"
+    />
+	 <col id="ZMM"
+      width="50"
+      type="2"
+      sort="true"
+    />
+	 <col id="ZMR"
+      width="50"
+      type="2"
+      sort="true"
+    />
+  </cols>
+  ' as '$XMLFORMAT'
+union all
+SELECT
+	t0.ItemCode 'Indeks$ItemCode'
+	,t0.ItemName 'Opis$ItemName'
+	,NrKat 'NrKat$NrKat'
+	,GroupName 'Grp_Mat$GroupName'
+	,ZS 'ZS$ZS'
+	,ZSL 'ZSL$ZSL'
+	,ZD 'ZD$ZD'
+	,ZDL 'ZDL$ZDL'
+	,IG + IL + TRANS + TRANSLOGIS'IM$IM'
+	,[IG] 'IG$IG'
+	,[IL] 'IL$IL'
+	,[IO] 'IO$IO'
+	,TRANS + TRANSLOGIS'TRANS$TRANS'
+	,BRAKI 'BRAKI$BRAKI'
+	,INW 'INW$INW'
+	,[WZ] 'WZ$WZ'
+	,cast(t0.WR1 as numeric(10,2)) 'WR1$WR1M'
+	,cast(t0.WR2 as numeric(10,1)) 'WR2$WR2M'
+	,WSK_SEZ '%$Sez'
+	,SP 'Status$Status'
+	,T1 'T$T1'
+	,ZM as 'ZM$Quantity'
+	,ZMR 'ZMR$ZMR'
+	,ZMM 'ZMM$ZMM'
+	,LastPrice as 'CZ$lastprice'
+	,round(ZM*LastPrice,2) N'Wartość$purvalue'
+	,WAGA 'WAGALICZ$WAGALICZ'
+	,WAGA*ZM 'WAGA$WAGA'
+	,OBJETOSC 'OBJETOSCLICZ$OBJETOSCLICZ'
+	,OBJETOSC*ZM 'OBJETOSC$OBJETOSC'
+	,cast(WR1Kart as numeric(10,2)) 'WR1kart$WR1kart'
+	,cast(WR2Kart as numeric(10,1)) 'WR2kart$WR2kart'
+	,SumaRotacji 'SumaRotacji'
+/*
+16777215 - FFFFFF - biały
+8650608 - 83FF70 - Zielony
+16760820 - FFBFF4 -Fiolet
+16711680 -czerwony
+12714480 - indygo
+*/
+,CASE WHEN t1.QRYGROUP29='Y' and @TYP_ALG not in ('Log','Od') THEN 255
+ELSE
+CASE WHEN  @magazyn like '%GD%HAND%' and @opcja<>2 and
+	(
+		[IO2]>1 and isnull(SP,0)=0
+	)
+THEN 16760820
+ELSE
+	case when INW > 0 then 12705900
+	when isnull(SP,0)=0
+	THEN
+		CASE WHEN isnull(t2.IloscWZ ,0) + IloscZS > 4
+		THEN
+		8650608 --zielony
+		ELSE
+		16777215 --biały
+		END
+	ELSE
+		CASE WHEN isnull(t2.IloscWZ , 0) + IloscZS < 4
+		THEN
+		16746854 --niebieski
+		ELSE
+		16777215 --biały
+		END
+	END
+END
+END as '$COLOR'
+
+,  N'
+  <cols>
+    <col id="ItemCode"
+      width="200"
+      linkedobject="4"
+	  sort="true"
+    />
+    <col id="ItemName"
+      width="250"
+	  sort="true"
+    />
+	 <col id="NrKat"
+      width="100"
+	  sort="true"
+    />
+	<col id="GroupName"
+      width="100"
+	  sort="true"
+    />
+    <col id="ZS"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="11730879"
+    />
+	<col id="ZSL"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="11730879"
+    />
+	<col id="ZD"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="12713980"
+    />
+	<col id="ZDL"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="12713980"
+    />
+	<col id="IM"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="1875436"
+    />
+	<col id="IG"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="IL"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="IO"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="TRANS"
+      width="55"
+      type="2"
+	  color="12713980"
+    />
+	<col id="BRAKI"
+      width="55"
+      type="2"
+	  color="12713980"
+    />
+	<col id="INW"
+      width="55"
+      type="2"
+	  color="12713980"
+    />
+	<col id="WZ"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="WAGALICZ"
+      width="0"
+      type="2"
+    />
+	<col id="WAGA"
+      width="70"
+      type="2"
+	  sort="true"
+      sum="true"
+	  algorithm = "WAGALICZ * Quantity"
+    />
+	<col id="OBJETOSCLICZ"
+      width="0"
+      type="2"
+    />
+	<col id="OBJETOSC"
+      width="70"
+      type="2"
+	  sort="true"
+      sum="true"
+	  algorithm = "OBJETOSCLICZ * Quantity"
+    />
+	<col id="WR1M"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR2M"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="Sez"
+	  type="2"
+      width="40"
+	  sort="true"
+    />
+	<col id="Status"
+	  type="2"
+      width="40"
+	  sort="true"
+    />
+	<col id="T"
+      type="2"
+	  width="50"
+	  sort="true"
+    />
+    <col id="Algorytm"
+      width="100"
+      type="0"
+	  sort="true"
+    />
+    <col id="Quantity"
+      width="50"
+      type="2"
+      edit="true"
+      sum="true"
+	  sort="true"
+	  color="12713980"
+    />
+    <col id="lastprice"
+      width="60"
+      type="2"
+	  sort="true"
+    />
+    <col id="purvalue"
+      width="100"
+      type="2"
+      sum="true"
+	  sort="true"
+      algorithm = "lastprice * Quantity"
+    />
+    <col id="Comments"
+      width="0"
+      edit="true"
+	  sort="true"
+    />
+	 <col id="ZMM"
+      width="50"
+      type="2"
+      sort="true"
+    />
+	 <col id="ZMR"
+      width="50"
+      type="2"
+      sort="true"
+    />
+	<col id="WR1Kart"
+      width="70"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR2Kart"
+      width="70"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+  </cols>
+  ' as '$XMLFORMAT'
+FROM #wynik t0
+inner join oitm t1 on t0.itemcode=t1.itemcode collate polish_ci_as
+inner join #Items t2 on t0.ItemCode = t2.ItemCode
+END
+ELSE
+BEGIN
+SELECT
+	t0.ItemCode 'Indeks$ItemCode'
+	,t0.ItemName 'Opis$ItemName'
+	,NrKat 'NrKat$NrKat'
+	,ZS 'ZS$ZS'
+	,ZD 'ZD$ZD'
+	,IM 'IM$IM'
+	,TRANS 'TRANS$TRANS'
+	,[IO] 'IO$IO'
+	,[IG] 'IG$IG'
+	,[IL] 'IL$IL'
+	,BRAKI 'BRAKI$BRAKI'
+	,[WZ] 'WZ$WZ'
+	,WAGA 'WAGALICZ$WAGALICZ'
+	,WAGA*ZM 'WAGA$WAGA'
+	,OBJETOSC 'OBJETOSCLICZ$OBJETOSCLICZ'
+	,OBJETOSC*ZM 'OBJETOSC$OBJETOSC'
+	,cast(t0.WR1 as decimal(10,2)) 'WR1$WR1M'
+	,cast(t0.WR2 as decimal(10,1)) 'WR2$WR2M'
+	,WSK_SEZ 'Sez %$Sez'
+	,SP 'Status$Status'
+	,T1 'T$T1'
+	,ZM as 'ZM$Quantity'
+	,LastPrice as 'CZ$lastprice'
+	,round(ZM*LastPrice,2) N'Wartość$purvalue'
+	,SumaRotacji 'SumaRotacji$SUMWR'
+	,
+CASE WHEN t1.QRYGROUP29='Y' and @TYP_ALG not in ('Log','Od') THEN 255
+ELSE
+CASE WHEN  @magazyn like '%GD%HAND%' and @opcja<>2 and
+	(
+		[IO2]>1
+	)
+THEN 16760820
+ELSE
+	case when isnull(SP,0)=0
+	THEN
+		CASE WHEN isnull(t2.IloscWZ,0) > 3
+		THEN
+		8650608 --zielony
+		ELSE
+		16777215 --biały
+		END
+	ELSE
+		CASE WHEN isnull(t2.IloscWZ,0) < 3
+		THEN
+		16746854 --niebieski
+		ELSE
+		16777215 --biały
+		END
+	END
+END
+END
+as '$COLOR'
+,  N'
+  <cols>
+    <col id="ItemCode"
+      width="100"
+      linkedobject="4"
+	  sort="true"
+    />
+    <col id="ItemName"
+      width="250"
+	  sort="true"
+    />
+	 <col id="NrKat"
+      width="100"
+	  sort="true"
+    />
+    <col id="ZS"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="11730879"
+    />
+	<col id="ZD"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="11730879"
+    />
+	<col id="IM"
+      width="40"
+      type="2"
+	  sort="true"
+	  color="1875436"
+    />
+	<col id="IO"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="IG"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="IL"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="TRANS"
+      width="70"
+      type="2"
+	  color="1875436"
+    />
+	<col id="BRAKI"
+      width="60"
+      type="2"
+	  color="12713980"
+    />
+	<col id="WZ"
+      width="40"
+      type="2"
+	  sort="true"
+    />
+	<col id="WAGALICZ"
+      width="0"
+      type="2"
+    />
+	<col id="WAGA"
+      width="70"
+      type="2"
+	  sort="true"
+      sum="true"
+	  algorithm = "WAGALICZ * Quantity"
+    />
+	<col id="OBJETOSCLICZ"
+      width="0"
+      type="2"
+    />
+	<col id="OBJETOSC"
+      width="70"
+      type="2"
+	  sort="true"
+      sum="true"
+	  algorithm = "OBJETOSCLICZ * Quantity"
+    />
+	<col id="WR1"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR2"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="SUMWR"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR1M"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="WR2M"
+      width="60"
+	  type="2"
+	  sort="true"
+	  color="14079702"
+    />
+	<col id="Sez"
+      width="60"
+	  type="2"
+	  sort="true"
+    />
+	<col id="Status"
+      width="60"
+	  type="2"
+	  sort="true"
+    />
+    <col id="Algorytm"
+      width="100"
+      type="0"
+	  sort="true"
+    />
+    <col id="Quantity"
+      width="50"
+      type="2"
+      edit="true"
+      sum="true"
+	  sort="true"
+	  color="12713980"
+    />
+    <col id="lastprice"
+      width="60"
+      type="2"
+	  sort="true"
+    />
+    <col id="purvalue"
+      width="100"
+      type="2"
+      sum="true"
+	  sort="true"
+      algorithm = "lastprice * Quantity"
+    />
+    <col id="Comments"
+      width="0"
+      edit="true"
+	  sort="true"
+    />
+	 <col id="ZMM"
+      width="50"
+      type="2"
+      sort="true"
+    />
+	 <col id="ZMR"
+      width="50"
+      type="2"
+      sort="true"
+    />
+  </cols>
+  ' as '$XMLFORMAT'
+FROM #wynik t0
+inner join oitm t1 on t0.itemcode=t1.itemcode collate polish_ci_as
+inner join #Items t2 on t0.ItemCode = t2.ItemCode
+END
+END
+
+
