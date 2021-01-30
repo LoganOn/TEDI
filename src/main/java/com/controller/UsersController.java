@@ -39,5 +39,12 @@ public class UsersController {
         );
     }
 
+//    @PostMapping
+//    public ResponseEntity<?> newUser (@RequestBody Users users) {
+//        usersRepository.save(users);
+//        return new ResponseEntity.created().build();
+//        );
+//    }
+
     //TODO findAllUsersByRole
 }

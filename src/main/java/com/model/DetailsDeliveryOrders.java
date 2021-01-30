@@ -22,8 +22,10 @@ public class DetailsDeliveryOrders {
   @Column(name = "id")
   private Long id;
 
-  @Column(name = "DeliveryOrderId")
-  private Long deliveryOrderId;
+  @ManyToOne
+  @JoinColumn(name = "DeliveryOrderId")
+  @JsonBackReference
+  private DeliveryOrders deliveryOrder;
 
   @Column(name = "LineNum")
   private int lineNum;

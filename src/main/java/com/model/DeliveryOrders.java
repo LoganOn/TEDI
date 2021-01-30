@@ -1,10 +1,12 @@
 package com.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Getter
@@ -55,4 +57,8 @@ public class DeliveryOrders {
 
   @Column(name = "ModifyDate",  nullable = false)
   private Timestamp modifyDate = new Timestamp(System.currentTimeMillis());
+
+  @OneToMany(mappedBy = "deliveryOrder", orphanRemoval = true)
+  @JsonManagedReference
+  private List<DetailsDeliveryOrders> detailsDeliveryOrdersList;
 }
