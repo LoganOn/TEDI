@@ -75,7 +75,9 @@ CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   `Comments` Text,
   `CreationDate` Timestamp NOT NULL,
   `ModifyDate` Timestamp NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`DeliveryOrderId`)
+      REFERENCES DeliveryOrders(DeliveryOrderId)
 );
 #Trzeba bedzie zaimplementowac cos na wzor danych podstawowych Yuppim
 CREATE TABLE IF NOT EXISTS `Items` (
