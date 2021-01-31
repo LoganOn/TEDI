@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,7 +50,7 @@ public class SignupController {
   @PostMapping(
           path="api/register",
           consumes = "application/json")
-  public UserSignupDto regsiterNewAccount(
+  public ResponseEntity<?> regsiterNewAccount(
           @RequestBody @Valid UserSignupDto signupDto,
           BindingResult result,
           HttpServletRequest request,
@@ -66,7 +68,7 @@ public class SignupController {
     }
     Users registered = userService.save(signupDto);
     eventPublisher.publishEvent(new OnSignupCompleteEvent(registered, request.getLocale(), "appUrl"));
-    return signupDto;
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   private boolean isValid(String password) {
