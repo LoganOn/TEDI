@@ -2,6 +2,7 @@ package com.controller;
 
 import com.model.DeliveryOrders;
 import com.model.DetailsDeliveryOrders;
+import com.repository.DeliveryOrdersRepository;
 import com.repository.DetailsDeliveryOrderRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,9 @@ import java.util.Optional;
 @AllArgsConstructor
 public class DetailsDeliveryOrderController {
 
-    @Autowired
     private DetailsDeliveryOrderRepository detailsDeliveryOrderRepository;
+
+    private DeliveryOrdersRepository deliveryOrdersRepository;
 
     @GetMapping("/all")
     @ResponseBody
@@ -35,7 +37,7 @@ public class DetailsDeliveryOrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findDetailsOrderByDeliveryId(@PathVariable Long id) {
-        List<DetailsDeliveryOrders> detailsDeliveryOrder = detailsDeliveryOrderRepository.findAllDetailsDeliveryOrdersByDeliveryOrderId(id);
+        List<DetailsDeliveryOrders> detailsDeliveryOrder = detailsDeliveryOrderRepository.findAllByDeliveryOrder(deliveryOrdersRepository.findById(id).get().getDeliveryOrderId());
         return new ResponseEntity<>(
                 detailsDeliveryOrder, detailsDeliveryOrder == null ?
                 HttpStatus.NOT_FOUND : detailsDeliveryOrder.isEmpty() ?
