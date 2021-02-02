@@ -46,7 +46,6 @@ public class SignupController {
 
   private final Pattern pattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}+$");
 
-  //TODO Change signature to RedirectView
   @PostMapping(
           path="api/register",
           consumes = "application/json")
