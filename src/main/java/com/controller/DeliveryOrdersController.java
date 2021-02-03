@@ -80,19 +80,25 @@ public class DeliveryOrdersController {
   }
 
   //TODO change to headers
-  @GetMapping
-  public ResponseEntity<?> findOrdersByUserandBaseRefandCustomerNumber(@RequestParam(required = false, defaultValue = "") String name,
-                                                                       @RequestParam(required = false, defaultValue = "") String baseRef,
-                                                                       @RequestParam(required = false, defaultValue = "") String CusNumber) {
-    List<DeliveryOrders> deliveryOrders;
-    if(!name.isBlank()) {
-      Users users = usersRepository.fin
-    }
-    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findByBaseRefContaining(baseRef);
-    return new ResponseEntity<>(
-            deliveryOrders, deliveryOrders == null ?
-            HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
-            HttpStatus.NO_CONTENT : HttpStatus.OK
-    );
-  }
+//  @GetMapping
+//  public ResponseEntity<?> findOrdersByUserandBaseRefandCustomerNumber(@RequestParam(required = false, defaultValue = "") String name,
+//                                                                       @RequestParam(required = false, defaultValue = "") String baseRef,
+//                                                                       @RequestParam(required = false, defaultValue = "") String cusNumber) {
+//    List<DeliveryOrders> deliveryOrders;
+//    if(!name.isBlank()) {
+//      List <Users> users = usersRepository.findAllByNameContaining(name);
+//    }
+//    if(!baseRef.isBlank()) {
+//      List <Users> users = usersRepository.findAllByNameContaining(name);
+//    }
+//    if(!cusNumber.isBlank()) {
+//      List <Users> users = usersRepository.findAllByNameContaining(name);
+//    }
+//    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findByBaseRefContaining(baseRef);
+//    return new ResponseEntity<>(
+//            deliveryOrders, deliveryOrders == null ?
+//            HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
+//            HttpStatus.NO_CONTENT : HttpStatus.OK
+//    );
+//  }
 }

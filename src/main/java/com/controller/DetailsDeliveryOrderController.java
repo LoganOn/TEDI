@@ -38,7 +38,7 @@ public class DetailsDeliveryOrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findDetailsOrderByDeliveryId(@PathVariable Long id) {
-        List<DetailsDeliveryOrders> detailsDeliveryOrder = detailsDeliveryOrderRepository.findAllByDeliveryOrder(deliveryOrdersRepository.findById(id).get(), PageRequest.of(1,1));
+        List<DetailsDeliveryOrders> detailsDeliveryOrder = detailsDeliveryOrderRepository.findAllByDeliveryOrder(deliveryOrdersRepository.findById(id).get());
         return new ResponseEntity<>(
                 detailsDeliveryOrder, detailsDeliveryOrder == null ?
                 HttpStatus.NOT_FOUND : detailsDeliveryOrder.isEmpty() ?
