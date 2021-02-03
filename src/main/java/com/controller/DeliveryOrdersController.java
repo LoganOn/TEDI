@@ -4,13 +4,11 @@ import com.model.DeliveryOrders;
 import com.repository.DeliveryOrdersRepository;
 import com.repository.UsersRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,13 +19,17 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class DeliveryOrdersController {
 
-    private DeliveryOrdersRepository deliveryOrdersRepository;
+    private final DeliveryOrdersRepository deliveryOrdersRepository;
 
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
+
+    private static final int SIZE = 20;
 
     @GetMapping
-    public ResponseEntity<?> findAllOrders() {
-        List<DeliveryOrders> deliveryOrders = (List<DeliveryOrders>) deliveryOrdersRepository.findAll();
+    public ResponseEntity<?> findAllOrders(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size) {
+        int p = page == null ?  1 : page <= 0 ? 1 : page;
+        int s = size == null ?  1 : size <= 20 ? SIZE : size;
+        List<DeliveryOrders> deliveryOrders = (List<DeliveryOrders>) deliveryOrdersRepository.findAll(PageRequest.of(p - 1,s));
         return new ResponseEntity<>(
                 deliveryOrders, deliveryOrders == null ?
                 HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?

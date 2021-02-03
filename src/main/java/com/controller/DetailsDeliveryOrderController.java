@@ -6,6 +6,7 @@ import com.repository.DeliveryOrdersRepository;
 import com.repository.DetailsDeliveryOrderRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class DetailsDeliveryOrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findDetailsOrderByDeliveryId(@PathVariable Long id) {
-        List<DetailsDeliveryOrders> detailsDeliveryOrder = detailsDeliveryOrderRepository.findAllByDeliveryOrder(deliveryOrdersRepository.findById(id).get());
+        List<DetailsDeliveryOrders> detailsDeliveryOrder = detailsDeliveryOrderRepository.findAllByDeliveryOrder(deliveryOrdersRepository.findById(id).get(), PageRequest.of(1,1));
         return new ResponseEntity<>(
                 detailsDeliveryOrder, detailsDeliveryOrder == null ?
                 HttpStatus.NOT_FOUND : detailsDeliveryOrder.isEmpty() ?
