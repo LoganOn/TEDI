@@ -15,9 +15,9 @@ import java.util.Optional;
 @Repository
 public interface DeliveryOrdersRepository extends CrudRepository<DeliveryOrders, Long> {
 
-    List<DeliveryOrders> findAllBySupplier (Users supplier);
+    List<DeliveryOrders> findAllBySupplier (Users supplier, Pageable pageable);
 
-    List<DeliveryOrders> findAllByCustomer(Users customer);
+    List<DeliveryOrders> findAllByCustomer(Users customer, Pageable pageable);
 
     Optional<DeliveryOrders> findByBaseRef (String baseRef);
 

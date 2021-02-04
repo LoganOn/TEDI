@@ -2,6 +2,7 @@ package com.controller;
 
 import com.handler.DeliveryOrdersDTO;
 import com.model.DeliveryOrders;
+import com.model.MinimalInfo;
 import com.repository.DeliveryOrdersRepository;
 import com.repository.UsersRepository;
 import lombok.AllArgsConstructor;
@@ -26,18 +27,6 @@ public class DeliveryOrdersController {
 
   private static final int SIZE = 20;
 
-  @GetMapping
-  public ResponseEntity<?> findAllOrders(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size) {
-    int p = page == null ? 1 : page <= 0 ? 1 : page;
-    int s = size == null ? 1 : size <= 20 ? SIZE : size;
-    List<DeliveryOrders> deliveryOrders = (List<DeliveryOrders>) deliveryOrdersRepository.findAll(PageRequest.of(p - 1, s));
-    return new ResponseEntity<>(
-            deliveryOrders, deliveryOrders == null ?
-            HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
-            HttpStatus.NO_CONTENT : HttpStatus.OK
-    );
-  }
-
   @GetMapping("/{id}")
   public ResponseEntity<?> findOrdersById(@PathVariable Long id) {
     Optional<DeliveryOrders> deliveryOrder = deliveryOrdersRepository.findById(id);
@@ -49,8 +38,11 @@ public class DeliveryOrdersController {
   }
 
   @GetMapping("/supplier/{id}")
-  public ResponseEntity<?> findAllOrdersBySupplierId(@PathVariable Long id) {
-    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllBySupplier(usersRepository.findById(id).get());
+  public ResponseEntity<?> findAllOrdersBySupplierId(@PathVariable Long id,
+                                                     @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size) {
+    int p = page == null ? 1 : page <= 0 ? 1 : page;
+    int s = size == null ? 1 : size <= 20 ? SIZE : size;
+    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllBySupplier(usersRepository.findById(id).get(), PageRequest.of(p - 1, s));
     return new ResponseEntity<>(
             deliveryOrders, deliveryOrders == null ?
             HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
@@ -59,8 +51,11 @@ public class DeliveryOrdersController {
   }
 
   @GetMapping("/customer/{id}")
-  public ResponseEntity<?> findAllOrdersByCustomerId(@PathVariable Long id) {
-    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllByCustomer(usersRepository.findById(id).get());
+  public ResponseEntity<?> findAllOrdersByCustomerId(@PathVariable Long id,
+                                                     @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size) {
+    int p = page == null ? 1 : page <= 0 ? 1 : page;
+    int s = size == null ? 1 : size <= 20 ? SIZE : size;
+    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllByCustomer(usersRepository.findById(id).get(), PageRequest.of(p - 1, s));
     return new ResponseEntity<>(
             deliveryOrders, deliveryOrders == null ?
             HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
@@ -69,9 +64,12 @@ public class DeliveryOrdersController {
   }
 
   @GetMapping("/customer/{id1}/supplier/{id2}")
-  public ResponseEntity<?> findAllOrdersByCustomerIdAndSupplierId(@PathVariable Long id1, @PathVariable Long id2) {
+  public ResponseEntity<?> findAllOrdersByCustomerIdAndSupplierId(@PathVariable Long id1, @PathVariable Long id2,
+                                                                  @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size) {
 
-    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllByCustomer(usersRepository.findById(id1).get());
+    int p = page == null ? 1 : page <= 0 ? 1 : page;
+    int s = size == null ? 1 : size <= 20 ? SIZE : size;
+    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllByCustomer(usersRepository.findById(id1).get(), PageRequest.of(p - 1, s));
     List<DeliveryOrders> deliveryOrdersFiltering = deliveryOrders.stream().filter(d -> d.getSupplier().getUserId() == id2).collect(Collectors.toList());
     return new ResponseEntity<>(
             deliveryOrdersFiltering, deliveryOrdersFiltering == null ?
@@ -80,26 +78,33 @@ public class DeliveryOrdersController {
     );
   }
 
-//  //TODO change to headers
-//  @GetMapping
-//  public ResponseEntity<?> findOrdersByUserandBaseRefandCustomerNumber(@RequestBody MinimalInfo minimalInfo, @RequestParam(required = false, defaultValue = "") String name,
-//                                                                       @RequestParam(required = false, defaultValue = "") String baseRef,
-//                                                                       @RequestParam(required = false, defaultValue = "") String cusNumber) {
-//    List<DeliveryOrders> deliveryOrders;
-//    if(!name.isBlank()) {
-//      List <Users> users = usersRepository.findAllByNameContaining(name);
-//    }
-//    if(!baseRef.isBlank()) {
-//      List <Users> users = usersRepository.findAllByNameContaining(name);
-//    }
-//    if(!cusNumber.isBlank()) {
-//      List <Users> users = usersRepository.findAllByNameContaining(name);
-//    }
-//    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findByBaseRefContaining(baseRef);
-//    return new ResponseEntity<>(
-//            deliveryOrders, deliveryOrders == null ?
-//            HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
-//            HttpStatus.NO_CONTENT : HttpStatus.OK
-//    );
-//  }
+  @GetMapping()
+  public ResponseEntity<?> findOrdersByUserandBaseRefandCustomerNumber(@RequestBody MinimalInfo minimalInfo, @RequestParam(required = false, defaultValue = "") String name,
+                                                                       @RequestParam(required = false, defaultValue = "") String baseRef,
+                                                                       @RequestParam(required = false, defaultValue = "") String cusNumber,
+                                                                       @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size) {
+    List<DeliveryOrders> deliveryOrders;
+    int p = page == null ? 1 : page <= 0 ? 1 : page;
+    int s = size == null ? 1 : size <= 20 ? SIZE : size;
+
+    if (minimalInfo.getRole().equals("customer")) {
+      deliveryOrders = deliveryOrdersRepository.findAllByCustomer(usersRepository.findById(minimalInfo.getUserid()).get(), PageRequest.of(p - 1, s));
+      deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getSupplier().getName().contains(name)).collect(Collectors.toList());
+      deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getBaseRef().contains(baseRef)).collect(Collectors.toList());
+      deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getNumberOrderCustomer().contains(cusNumber)).collect(Collectors.toList());
+    } else if (minimalInfo.getRole().equals("supplier")) {
+      deliveryOrders = deliveryOrdersRepository.findAllBySupplier(usersRepository.findById(minimalInfo.getUserid()).get(), PageRequest.of(p - 1, s));
+      deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getSupplier().getName().contains(name)).collect(Collectors.toList());
+      deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getBaseRef().contains(baseRef)).collect(Collectors.toList());
+      deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getNumberOrderCustomer().contains(cusNumber)).collect(Collectors.toList());
+    } else {
+      deliveryOrders = null;
+    }
+
+    return new ResponseEntity<>(
+            deliveryOrders, deliveryOrders == null ?
+            HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
+            HttpStatus.NO_CONTENT : HttpStatus.OK
+    );
+  }
 }
