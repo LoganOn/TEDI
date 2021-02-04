@@ -1,9 +1,11 @@
 package com.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -16,7 +18,7 @@ public class Users {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "UserId")
-  private Long UserId;
+  private Long userId;
 
   @Column(name = "Role", length = 20)
   private String role;
@@ -63,11 +65,11 @@ public class Users {
 //  @JsonManagedReference
 //  private List<DeliveryOrders> deliveryOrdersList;
 
-//  @OneToMany(mappedBy = "userId1", orphanRemoval = true)
+//  @OneToMany(mappedBy = "supplier", orphanRemoval = true)
 //  @JsonManagedReference
 //  private List<RelationsUsers> relationsList1;
 //
-//  @OneToMany(mappedBy = "userId2", orphanRemoval = true)
+//  @OneToMany(mappedBy = "customer", orphanRemoval = true)
 //  @JsonManagedReference
 //  private List<RelationsUsers> relationsList2;
 }

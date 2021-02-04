@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface RelationsUsersRepository extends CrudRepository<RelationsUsers, Long> {
 
-  List<RelationsUsers> findAllByUserId1 (Long userId);
+  List<RelationsUsers> findAllBySupplier (Users supplier);
 
-  List<RelationsUsers> findAllByUserId2 (Long userId);
+  List<RelationsUsers> findAllByCustomer (Users customer);
 }

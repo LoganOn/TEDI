@@ -1,7 +1,7 @@
 package com.controller;
 
+import com.handler.DeliveryOrdersDTO;
 import com.model.DeliveryOrders;
-import com.model.Users;
 import com.repository.DeliveryOrdersRepository;
 import com.repository.UsersRepository;
 import lombok.AllArgsConstructor;
@@ -50,7 +50,7 @@ public class DeliveryOrdersController {
 
   @GetMapping("/supplier/{id}")
   public ResponseEntity<?> findAllOrdersBySupplierId(@PathVariable Long id) {
-    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllByUserId1(usersRepository.findById(id).get().getUserId());
+    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllBySupplier(usersRepository.findById(id).get());
     return new ResponseEntity<>(
             deliveryOrders, deliveryOrders == null ?
             HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
@@ -60,7 +60,7 @@ public class DeliveryOrdersController {
 
   @GetMapping("/customer/{id}")
   public ResponseEntity<?> findAllOrdersByCustomerId(@PathVariable Long id) {
-    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllByUserId2(usersRepository.findById(id).get().getUserId());
+    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllByCustomer(usersRepository.findById(id).get());
     return new ResponseEntity<>(
             deliveryOrders, deliveryOrders == null ?
             HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
@@ -70,8 +70,9 @@ public class DeliveryOrdersController {
 
   @GetMapping("/customer/{id1}/supplier/{id2}")
   public ResponseEntity<?> findAllOrdersByCustomerIdAndSupplierId(@PathVariable Long id1, @PathVariable Long id2) {
-    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllByUserId2(usersRepository.findById(id1).get().getUserId());
-    List<DeliveryOrders> deliveryOrdersFiltering = deliveryOrders.stream().filter(d -> d.getUserId1() == id2).collect(Collectors.toList());
+
+    List<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findAllByCustomer(usersRepository.findById(id1).get());
+    List<DeliveryOrders> deliveryOrdersFiltering = deliveryOrders.stream().filter(d -> d.getSupplier().getUserId() == id2).collect(Collectors.toList());
     return new ResponseEntity<>(
             deliveryOrdersFiltering, deliveryOrdersFiltering == null ?
             HttpStatus.NOT_FOUND : deliveryOrdersFiltering.isEmpty() ?
@@ -79,9 +80,9 @@ public class DeliveryOrdersController {
     );
   }
 
-  //TODO change to headers
+//  //TODO change to headers
 //  @GetMapping
-//  public ResponseEntity<?> findOrdersByUserandBaseRefandCustomerNumber(@RequestParam(required = false, defaultValue = "") String name,
+//  public ResponseEntity<?> findOrdersByUserandBaseRefandCustomerNumber(@RequestBody MinimalInfo minimalInfo, @RequestParam(required = false, defaultValue = "") String name,
 //                                                                       @RequestParam(required = false, defaultValue = "") String baseRef,
 //                                                                       @RequestParam(required = false, defaultValue = "") String cusNumber) {
 //    List<DeliveryOrders> deliveryOrders;

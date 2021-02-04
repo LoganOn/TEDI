@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS `Users` (
 
 CREATE TABLE IF NOT EXISTS `RelationsUsers` (
   `RelationUsersId` Integer NOT NULL AUTO_INCREMENT,
-  `UserId1` Integer,
-  `UserId2` Integer,
+  `UserSupplierId` Integer,
+  `UserCustomerId` Integer,
   `Active` boolean,
   `CreationDate` Timestamp NOT NULL,
   `ModifyDate` Timestamp NOT NULL,
@@ -37,26 +37,28 @@ CREATE TABLE IF NOT EXISTS `DeliveryOrders` (
   `DeliveryOrderId` Integer NOT NULL AUTO_INCREMENT,
   `BaseRef` Varchar(64) NOT NULL,
   `NumberOrderCustomer` Varchar(64) NOT NULL,
-  `DocNumberPositions` Integer,
   `DocStatus` Varchar(1) NOT NULL , -- close, open, cancelled
-  `UserId1` Integer,
-  `UserId2` Integer,
+  `UserSupplierId` Integer,
+  `UserCustomerId` Integer,
   `DocTotal` Numeric(10,2),  -- total value order
   `DocNet` Numeric(10,2), -- net value
   `DocVatSum` Numeric(10,2), -- tax value
   `Description` Text,
   `CreationDate` Timestamp NOT NULL,
   `ModifyDate` Timestamp NOT NULL,
-  PRIMARY KEY (`DeliveryOrderId`)
+  PRIMARY KEY (`DeliveryOrderId`),
+  FOREIGN KEY (`UserSupplierId`)
+            REFERENCES Users(UserId),
+  FOREIGN KEY (`UserCustomerId`)
+        REFERENCES Users(UserId)
 );
 
 CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   `id` Integer NOT NULL AUTO_INCREMENT,
   `DeliveryOrderId` Integer,
-  `LineNum` Integer NOT NULL,
   `BaseRef` Varchar(64) NOT NULL,
-  `UserId1` Integer,
-  `UserId2` Integer,
+  `UserSupplierId` Integer,
+  `UserCustomerId` Integer,
   `ItemCode` Varchar(100),
   `ItemName` Varchar(255),
   `Quantity` Numeric(10,2),
@@ -77,7 +79,11 @@ CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   `ModifyDate` Timestamp NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`DeliveryOrderId`)
-      REFERENCES DeliveryOrders(DeliveryOrderId)
+      REFERENCES DeliveryOrders(DeliveryOrderId),
+  FOREIGN KEY (`UserSupplierId`)
+            REFERENCES Users(UserId),
+  FOREIGN KEY (`UserCustomerId`)
+        REFERENCES Users(UserId)
 );
 #Trzeba bedzie zaimplementowac cos na wzor danych podstawowych Yuppim
 CREATE TABLE IF NOT EXISTS `Items` (
