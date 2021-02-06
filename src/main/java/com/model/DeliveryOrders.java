@@ -27,18 +27,19 @@ public class DeliveryOrders {
   @Column(name = "NumberOrderCustomer", length = 64)
   private String numberOrderCustomer;
 
-  @Column(name = "DocNumberPositions")
-  private int DocNumberPositions;
-
   //Close, open, cancelled
   @Column(name = "DocStatus", length = 1, nullable = false)
-  private char DocStatus;
-  //owner document (supplier)
-  @Column(name = "UserId1")
-  private Long userId1;
-  //customer
-  @Column(name = "UserId2")
-  private Long userId2;
+  private char docStatus;
+
+  @ManyToOne
+  @JoinColumn(name = "UserSupplierId")
+  @JsonManagedReference
+  private Users supplier;
+
+  @ManyToOne
+  @JoinColumn(name = "UserCustomerId")
+  @JsonManagedReference
+  private Users customer;
 
   @Column(name = "DocTotal")
   private double docTotal;
@@ -59,6 +60,6 @@ public class DeliveryOrders {
   private Timestamp modifyDate = new Timestamp(System.currentTimeMillis());
 
   @OneToMany(mappedBy = "deliveryOrder", orphanRemoval = true)
-  @JsonManagedReference
+  @JsonBackReference
   private List<DetailsDeliveryOrders> detailsDeliveryOrdersList;
 }

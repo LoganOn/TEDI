@@ -1,8 +1,6 @@
 package com.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,17 +25,18 @@ public class DetailsDeliveryOrders {
   @JsonBackReference
   private DeliveryOrders deliveryOrder;
 
-  @Column(name = "LineNum")
-  private int lineNum;
-
   @Column(name = "BaseRef", length = 64)
   private String baseRef;
 
-  @Column(name = "UserId1")
-  private Long userId1;
+  @ManyToOne
+  @JoinColumn(name = "UserSupplierId")
+  @JsonBackReference
+  private Users supplier;
 
-  @Column(name = "UserId2")
-  private Long userId2;
+  @ManyToOne
+  @JoinColumn(name = "UserCustomerId")
+  @JsonBackReference
+  private Users customer;
 
   @Column(name = "ItemCode", length = 100)
   private String itemCode;

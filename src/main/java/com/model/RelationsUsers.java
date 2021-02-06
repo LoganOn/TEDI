@@ -2,6 +2,7 @@ package com.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,11 +23,15 @@ public class RelationsUsers {
   @Column(name = "RelationUsersId")
   private Long relationUsersId;
 
-  @Column(name = "UserId1")
-  private Long userId1;
+  @ManyToOne
+  @JoinColumn(name = "UserSupplierId")
+  @JsonManagedReference
+  private Users supplier;
 
-  @Column(name = "UserId2")
-  private Long userId2;
+  @ManyToOne
+  @JoinColumn(name = "UserCustomerId")
+  @JsonManagedReference
+  private Users customer;
 
   @Column(name = "Active")
   private Boolean active;

@@ -35,7 +35,7 @@ public class RelationsController {
 
     @GetMapping("/customer/{id}")
     public ResponseEntity<?> findAllRelationsByCustomerId(@PathVariable Long id) {
-        List<RelationsUsers> relationsList = (List<RelationsUsers>) relationsRepository.findAllByUserId1(usersRepository.findById(id).get().getUserId());
+        List<RelationsUsers> relationsList = relationsRepository.findAllByCustomer(usersRepository.findById(id).get());
         return new ResponseEntity<>(
                 relationsList, relationsList == null ?
                 HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
@@ -45,7 +45,7 @@ public class RelationsController {
 
     @GetMapping("/supplier/{id}")
     public ResponseEntity<?> findAllRelationsBySupplierId(@PathVariable Long id) {
-        List<RelationsUsers> relationsList = (List<RelationsUsers>) relationsRepository.findAllByUserId2(usersRepository.findById(id).get().getUserId());
+        List<RelationsUsers> relationsList = relationsRepository.findAllBySupplier(usersRepository.findById(id).get());
         return new ResponseEntity<>(
                 relationsList, relationsList == null ?
                 HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
