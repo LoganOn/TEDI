@@ -61,7 +61,7 @@ public class DeliveryOrders {
   private Timestamp modifyDate = new Timestamp(System.currentTimeMillis());
 
   @OneToMany(mappedBy = "deliveryOrder", orphanRemoval = true)
-  @JsonManagedReference
+  @JsonBackReference
   private List<DetailsDeliveryOrders> detailsDeliveryOrdersList;
 
   public static DeliveryOrders toDeliveryOrders(DeliveryOrdersDTO deliveryOrdersDTO) {

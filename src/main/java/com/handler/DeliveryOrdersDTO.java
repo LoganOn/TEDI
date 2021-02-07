@@ -3,6 +3,7 @@ package com.handler;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.model.DetailsDeliveryOrders;
+import com.model.Users;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -25,9 +26,9 @@ public class DeliveryOrdersDTO {
 
   private char DocStatus;
 
-  private String supplier;
+  private Users supplier;
 
-  private String customer;
+  private Users customer;
 
   private double docTotal;
 

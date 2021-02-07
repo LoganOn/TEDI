@@ -1,6 +1,7 @@
 package com.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -22,7 +23,7 @@ public class DetailsDeliveryOrders {
 
   @ManyToOne
   @JoinColumn(name = "DeliveryOrderId")
-  @JsonBackReference
+  @JsonManagedReference
   private DeliveryOrders deliveryOrder;
 
   @Column(name = "BaseRef", length = 64)
@@ -30,12 +31,12 @@ public class DetailsDeliveryOrders {
 
   @ManyToOne
   @JoinColumn(name = "UserSupplierId")
-  @JsonBackReference
+  @JsonManagedReference
   private Users supplier;
 
   @ManyToOne
   @JoinColumn(name = "UserCustomerId")
-  @JsonBackReference
+  @JsonManagedReference
   private Users customer;
 
   @Column(name = "ItemCode", length = 100)
