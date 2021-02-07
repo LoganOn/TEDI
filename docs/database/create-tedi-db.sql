@@ -85,6 +85,17 @@ CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   FOREIGN KEY (`UserCustomerId`)
         REFERENCES Users(UserId)
 );
+
+CREATE TABLE IF NOT EXISTS `NotyficationUsers` (
+  `NotyficationUsersId` Integer NOT NULL AUTO_INCREMENT,
+  `UserSupplierId` Integer,
+  `UserCustomerId` Integer,
+  `Description` Text,
+  `Readed` boolean,
+  `CreationDate` Timestamp NOT NULL,
+  PRIMARY KEY (`RelationUsersId`)
+);
+
 #Trzeba bedzie zaimplementowac cos na wzor danych podstawowych Yuppim
 CREATE TABLE IF NOT EXISTS `Items` (
   `ItemId` Integer NOT NULL AUTO_INCREMENT,
