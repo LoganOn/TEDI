@@ -50,7 +50,7 @@ VALUES
 (22, "FV-2021-02-03", "20201210679", "O", 5, 1, 6000, 4878.05, 1121.95, "", NOW(), NOW()),
 (23, "FV-2021-02-21", "20201210794", "O", 7, 1, 6000, 4878.05, 1121.95, "Praesent sed fringilla lorem. Nulla facilisi. Cras eget eleifend mauris, eget euismod massa. Vivamus ultricies eu elit a fringilla. In mattis, ipsum et accumsan egestas, sem erat lobortis justo, et ullamcorper eros tortor eget ipsum.", NOW(), NOW());
 INSERT INTO `DetailsDeliveryOrders`
-  (`id`, `DeliveryOrderId`, `BaseRef`, `UserId1`, `UserId2`, `ItemCode`, `ItemName`, `Quantity`, `CodeBars`, `Price`, `Currency`, `LineTotal`, `LineNet`, `LineVat`, `DiscountPrcnt`, `VatPrcnt`, `VatGroup`, `Active`, `OnTheWay`, `ScheduledShipDate`, `CreationDate`, `ModifyDate`)
+  (`id`, `DeliveryOrderId`, `BaseRef`, `UserSupplierId`, `UserCustomerId`, `ItemCode`, `ItemName`, `Quantity`, `CodeBars`, `Price`, `Currency`, `LineTotal`, `LineNet`, `LineVat`, `DiscountPrcnt`, `VatPrcnt`, `VatGroup`, `Active`, `OnTheWay`, `ScheduledShipDate`, `CreationDate`, `ModifyDate`)
 VALUES
 (1, 1, "ZAM-2020-20000", 4, 1, "XXX-Item1", "ItemName1", 1, "5900000000000", 1000,"PLN", 1000, 787, 813, "10%", 23, "DS23", 1, 0, "7 dni roboczych", NOW() - Interval 2 DAY, NOW() - Interval 2 DAY),
 (2, 1, "ZAM-2020-20000", 4, 1, "XXX-Item2", "ItemName2", 1, "5900000000000", 1000,"PLN", 1000, 787, 813, "10%", 23, "DS23", 1, 0, "7 dni roboczych", NOW() - Interval 2 DAY, NOW() - Interval 2 DAY),
