@@ -1,6 +1,5 @@
 package com.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.handler.DeliveryOrdersDTO;
 import lombok.*;
@@ -15,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class DeliveryOrders {
 
   @Id
@@ -64,15 +64,18 @@ public class DeliveryOrders {
   @JsonManagedReference
   private List<DetailsDeliveryOrders> detailsDeliveryOrdersList;
 
-  public static DeliveryOrders toDeliveryOrders(DeliveryOrdersDTO deliveryOrdersDTO) {
+  public static DeliveryOrders toDeliveryOrders(DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier) {
     return DeliveryOrders.builder()
             .baseRef(deliveryOrdersDTO.getBaseRef())
             .numberOrderCustomer(deliveryOrdersDTO.getNumberOrderCustomer())
+            .customer(customer)
+            .supplier(supplier)
             .docStatus(deliveryOrdersDTO.getDocStatus())
             .docTotal(deliveryOrdersDTO.getDocTotal())
             .docNet(deliveryOrdersDTO.getDocNet())
             .docVatSum(deliveryOrdersDTO.getDocVatSum())
             .description(deliveryOrdersDTO.getDescription())
+            .detailsDeliveryOrdersList(deliveryOrdersDTO.getDetailsDeliveryOrdersList())
             .build();
   }
 

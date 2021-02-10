@@ -5,10 +5,10 @@ import com.model.DeliveryOrders;
 import com.model.MinimalInfo;
 import com.repository.DeliveryOrdersRepository;
 import com.repository.UsersRepository;
+import com.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,13 +18,15 @@ import java.util.stream.Collectors;
 
 import static com.model.DeliveryOrders.toDeliveryOrders;
 
+
 @RestController
-//@RequestMapping(value = "/api/delivery", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 @RequestMapping(value = "/api/delivery", produces = "application/json")
 @AllArgsConstructor
 public class DeliveryOrdersController {
 
   private final DeliveryOrdersRepository deliveryOrdersRepository;
+
+  private final OrderService orderService;
 
   private final UsersRepository usersRepository;
 
@@ -125,29 +127,19 @@ public class DeliveryOrdersController {
     );
   }
 
-//  @PostMapping()
-//  public ResponseEntity<?> addDeliveryOrders(@RequestBody DeliveryOrders newOrder){
-//    System.out.println(newOrder.toString());
-//    Integer id = deliveryOrdersRepository.findAll().size() + 1;
-//    deliveryOrdersRepository.save(newOrder);
-//    return new ResponseEntity<>(
-//            id, id == null ?
-//            HttpStatus.NOT_FOUND : id == 0?
-//            HttpStatus.NO_CONTENT : HttpStatus.CREATED
-//    );
-//  }
-
-//  @PostMapping(value="/add", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value="/add" , consumes = "application/json")
-  public void addDeliveryOrders(@RequestBody DeliveryOrdersDTO deliveryOrders){
-   // Integer id = deliveryOrdersRepository.findAll().size() + 1;
-      //System.out.println(deliveryOrders.getDetailsDeliveryOrdersList().get(0));
+  public ResponseEntity addDeliveryOrders(@RequestBody DeliveryOrdersDTO deliveryOrdersDTO){
+      Integer id = deliveryOrdersRepository.findAll().size() + 1;
+      System.out.println(deliveryOrdersDTO.getDetailsDeliveryOrdersList().get(0));
       System.out.println("jest ok");
-//    deliveryOrdersRepository.save(toDeliveryOrders(deliveryOrders));
-//    return new ResponseEntity<>(
-//            id, id == null ?
-//            HttpStatus.NOT_FOUND : id == 0?
-//            HttpStatus.NO_CONTENT : HttpStatus.CREATED
-//    );
+      DeliveryOrders deliveryOrders1 = toDeliveryOrders(deliveryOrdersDTO);
+    //  deliveryOrders1.getDeliveryOrderId();
+      System.out.println(deliveryOrders1.toString());
+      //orderService.save(deliveryOrdersDTO);
+     return new ResponseEntity<>(
+          id, id == null ?
+           HttpStatus.NOT_FOUND : id == 0?
+           HttpStatus.NO_CONTENT : HttpStatus.CREATED
+   );
   }
 }

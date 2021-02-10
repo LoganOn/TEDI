@@ -1,15 +1,11 @@
 package com.handler;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.model.DetailsDeliveryOrders;
-import com.model.Users;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
@@ -42,12 +38,14 @@ public class DeliveryOrdersDTO {
 
   @Getter
   @Setter
+  @ToString
   static class UserSDTO {
     long id;
   }
 
   @Getter
   @Setter
+  @ToString
   static class DetailsDeliveryOrdersList {
     String itemCode;
     String itemName;
