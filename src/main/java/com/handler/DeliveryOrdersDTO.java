@@ -1,13 +1,21 @@
 package com.handler;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.model.DetailsDeliveryOrders;
+import com.model.Users;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+
 import java.sql.Timestamp;
+import java.util.List;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
+@ToString
 public class DeliveryOrdersDTO {
 
   private Long deliveryOrderId;
@@ -18,9 +26,9 @@ public class DeliveryOrdersDTO {
 
   private char DocStatus;
 
-  private String supplier;
+  private Users supplier;
 
-  private String customer;
+  private Users customer;
 
   private double docTotal;
 
@@ -33,6 +41,8 @@ public class DeliveryOrdersDTO {
   private Timestamp creationDate;
 
   private Timestamp modifyDate;
+  @JsonIgnore
+  private List<DetailsDeliveryOrders> detailsDeliveryOrdersList;
 }
 
 

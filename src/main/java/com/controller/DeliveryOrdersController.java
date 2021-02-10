@@ -16,8 +16,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.model.DeliveryOrders.toDeliveryOrders;
+
 @RestController
-@RequestMapping(value = "/api/delivery", produces = MediaType.APPLICATION_JSON_VALUE)
+//@RequestMapping(value = "/api/delivery", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/delivery", produces = "application/json")
 @AllArgsConstructor
 public class DeliveryOrdersController {
 
@@ -120,5 +123,30 @@ public class DeliveryOrdersController {
             HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
             HttpStatus.NO_CONTENT : HttpStatus.OK
     );
+  }
+
+//  @PostMapping()
+//  public ResponseEntity<?> addDeliveryOrders(@RequestBody DeliveryOrders newOrder){
+//    System.out.println(newOrder.toString());
+//    Integer id = deliveryOrdersRepository.findAll().size() + 1;
+//    deliveryOrdersRepository.save(newOrder);
+//    return new ResponseEntity<>(
+//            id, id == null ?
+//            HttpStatus.NOT_FOUND : id == 0?
+//            HttpStatus.NO_CONTENT : HttpStatus.CREATED
+//    );
+//  }
+
+//  @PostMapping(value="/add", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value="/add" , consumes = "application/json")
+  public void addDeliveryOrders(@RequestBody DeliveryOrders deliveryOrders){
+    Integer id = deliveryOrdersRepository.findAll().size() + 1;
+      System.out.println(deliveryOrders.getDetailsDeliveryOrdersList().get(0));
+//    deliveryOrdersRepository.save(toDeliveryOrders(deliveryOrders));
+//    return new ResponseEntity<>(
+//            id, id == null ?
+//            HttpStatus.NOT_FOUND : id == 0?
+//            HttpStatus.NO_CONTENT : HttpStatus.CREATED
+//    );
   }
 }

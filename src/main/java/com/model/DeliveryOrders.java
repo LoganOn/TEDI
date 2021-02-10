@@ -2,6 +2,7 @@ package com.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.handler.DeliveryOrdersDTO;
 import lombok.*;
 
 import javax.persistence.*;
@@ -62,4 +63,17 @@ public class DeliveryOrders {
   @OneToMany(mappedBy = "deliveryOrder", orphanRemoval = true)
   @JsonBackReference
   private List<DetailsDeliveryOrders> detailsDeliveryOrdersList;
+
+  public static DeliveryOrders toDeliveryOrders(DeliveryOrdersDTO deliveryOrdersDTO) {
+    return DeliveryOrders.builder()
+            .baseRef(deliveryOrdersDTO.getBaseRef())
+            .numberOrderCustomer(deliveryOrdersDTO.getNumberOrderCustomer())
+            .docStatus(deliveryOrdersDTO.getDocStatus())
+            .docTotal(deliveryOrdersDTO.getDocTotal())
+            .docNet(deliveryOrdersDTO.getDocNet())
+            .docVatSum(deliveryOrdersDTO.getDocVatSum())
+            .description(deliveryOrdersDTO.getDescription())
+            .build();
+  }
+
 }

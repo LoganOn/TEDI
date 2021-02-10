@@ -23,7 +23,7 @@ public interface DeliveryOrdersRepository extends CrudRepository<DeliveryOrders,
 
     List<DeliveryOrders> findByBaseRefContaining (String baseRef);
 
-    List<DeliveryOrders> findAll(Pageable pageable);
+    List<DeliveryOrders> findAll();
 
 //    @Query(value = "SELECT d.deliveryOrderId, d.baseRef, d.numberOrderCustomer, d.docStatus, c.name, d.docTotal, d.docNet, d.docVatSum, d.creationDate FROM DeliveryOrders d " +
 //            "JOIN Users s ON s.userId = d.userId1 " +
