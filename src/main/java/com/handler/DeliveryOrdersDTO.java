@@ -26,9 +26,9 @@ public class DeliveryOrdersDTO {
 
   private char DocStatus;
 
-  private Users supplier;
+  private UserSDTO supplier;
 
-  private Users customer;
+  private UserSDTO customer;
 
   private double docTotal;
 
@@ -38,12 +38,34 @@ public class DeliveryOrdersDTO {
 
   private String description;
 
-  private Timestamp creationDate;
+  private List<DetailsDeliveryOrdersList> detailsDeliveryOrdersList;
 
-  private Timestamp modifyDate;
-  @JsonIgnore
-  private List<DetailsDeliveryOrders> detailsDeliveryOrdersList;
+  @Getter
+  @Setter
+  static class UserSDTO {
+    long id;
+  }
+
+  @Getter
+  @Setter
+  static class DetailsDeliveryOrdersList {
+    String itemCode;
+    String itemName;
+    Double quantity;
+    String codeBars;
+    double price;
+    String currency;
+    double valueTotal;
+    double valueNet;
+    double valueVat;
+    String discountPercent;
+    String vatPercent;
+    String scheduledShipDate;
+  }
 }
+
+
+
 
 
 

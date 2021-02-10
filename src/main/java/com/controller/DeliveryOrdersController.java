@@ -139,9 +139,10 @@ public class DeliveryOrdersController {
 
 //  @PostMapping(value="/add", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value="/add" , consumes = "application/json")
-  public void addDeliveryOrders(@RequestBody DeliveryOrders deliveryOrders){
-    Integer id = deliveryOrdersRepository.findAll().size() + 1;
-      System.out.println(deliveryOrders.getDetailsDeliveryOrdersList().get(0));
+  public void addDeliveryOrders(@RequestBody DeliveryOrdersDTO deliveryOrders){
+   // Integer id = deliveryOrdersRepository.findAll().size() + 1;
+      //System.out.println(deliveryOrders.getDetailsDeliveryOrdersList().get(0));
+      System.out.println("jest ok");
 //    deliveryOrdersRepository.save(toDeliveryOrders(deliveryOrders));
 //    return new ResponseEntity<>(
 //            id, id == null ?

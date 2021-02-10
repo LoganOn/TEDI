@@ -23,7 +23,7 @@ public class DetailsDeliveryOrders {
 
   @ManyToOne
   @JoinColumn(name = "DeliveryOrderId")
-  @JsonManagedReference
+  @JsonBackReference
   private DeliveryOrders deliveryOrder;
 
   @Column(name = "BaseRef", length = 64)
