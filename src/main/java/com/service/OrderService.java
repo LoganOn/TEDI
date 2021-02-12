@@ -21,8 +21,8 @@ public class OrderService {
   private final DeliveryOrdersRepository deliveryOrdersRepository;
 
 
-  public DeliveryOrders save(DeliveryOrdersDTO deliveryOrdersDTO){
-    DeliveryOrders deliveryOrders = DeliveryOrders.toDeliveryOrders(deliveryOrdersDTO);
+  public DeliveryOrders save(DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier){
+    DeliveryOrders deliveryOrders = new DeliveryOrders(deliveryOrdersDTO, customer, supplier);
     return deliveryOrdersRepository.save(deliveryOrders);
   }
 

@@ -2,6 +2,7 @@ package com.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.handler.DeliveryOrdersDTO;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,7 +18,7 @@ import java.sql.Timestamp;
 public class DetailsDeliveryOrders {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
   private Long id;
 
@@ -69,7 +70,7 @@ public class DetailsDeliveryOrders {
   @Column(name = "DiscountPrcnt", length = 10)
   private String discountPrcnt;
 
-  @Column(name = "VatPrcnt")
+  @Column(name = "VatPrcnt") //przemyslec w jakich formacie, najlepiej jako enum
   private double vatPrcnt;
 
   @Column(name = "VatGroup", length = 10)
@@ -92,4 +93,21 @@ public class DetailsDeliveryOrders {
 
   @Column(name = "ModifyDate", nullable = false)
   private Timestamp modifyDate = new Timestamp(System.currentTimeMillis());
+
+  public static DetailsDeliveryOrders toDetailsDeliveryOrders (DeliveryOrdersDTO.DetailsDeliveryOrdersList deliveryOrdersList){
+    return DetailsDeliveryOrders.builder()
+      .itemCode(deliveryOrdersList.getItemCode())
+      .itemName(deliveryOrdersList.getItemName())
+      .quantity(deliveryOrdersList.getQuantity())
+      .codeBars(deliveryOrdersList.getCodeBars())
+      .price(deliveryOrdersList.getPrice())
+      .currency(deliveryOrdersList.getCurrency())
+      .lineTotal(deliveryOrdersList.getValueTotal())
+      .lineNet(deliveryOrdersList.getValueNet())
+      .lineVat(deliveryOrdersList.getValueVat())
+      .discountPrcnt(deliveryOrdersList.getDiscountPercent())
+      .vatPrcnt(deliveryOrdersList.getVatPercent())
+      .scheduledShipDate(deliveryOrdersList.getScheduledShipDate())
+            .build();
+  }
 }

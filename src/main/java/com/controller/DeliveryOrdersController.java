@@ -3,6 +3,7 @@ package com.controller;
 import com.handler.DeliveryOrdersDTO;
 import com.model.DeliveryOrders;
 import com.model.MinimalInfo;
+import com.model.Users;
 import com.repository.DeliveryOrdersRepository;
 import com.repository.UsersRepository;
 import com.service.OrderService;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.model.DeliveryOrders.toDeliveryOrders;
+//import static com.model.DeliveryOrders.toDeliveryOrders;
 
 
 @RestController
@@ -131,11 +132,9 @@ public class DeliveryOrdersController {
   public ResponseEntity addDeliveryOrders(@RequestBody DeliveryOrdersDTO deliveryOrdersDTO){
       Integer id = deliveryOrdersRepository.findAll().size() + 1;
       System.out.println(deliveryOrdersDTO.getDetailsDeliveryOrdersList().get(0));
-      System.out.println("jest ok");
-      DeliveryOrders deliveryOrders1 = toDeliveryOrders(deliveryOrdersDTO);
-    //  deliveryOrders1.getDeliveryOrderId();
-      System.out.println(deliveryOrders1.toString());
-      //orderService.save(deliveryOrdersDTO);
+      Optional <Users> customer = usersRepository.findById(deliveryOrdersDTO.getCustomer().getUserId());
+      Optional <Users> supplier = usersRepository.findById(deliveryOrdersDTO.getSupplier().getUserId());
+      orderService.save(deliveryOrdersDTO, customer.get(), supplier.get());
      return new ResponseEntity<>(
           id, id == null ?
            HttpStatus.NOT_FOUND : id == 0?

@@ -6,6 +6,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,7 +19,7 @@ import java.util.List;
 public class DeliveryOrders {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "DeliveryOrderId")
   private Long deliveryOrderId;
 
@@ -64,19 +65,29 @@ public class DeliveryOrders {
   @JsonManagedReference
   private List<DetailsDeliveryOrders> detailsDeliveryOrdersList;
 
-  public static DeliveryOrders toDeliveryOrders(DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier) {
-    return DeliveryOrders.builder()
-            .baseRef(deliveryOrdersDTO.getBaseRef())
-            .numberOrderCustomer(deliveryOrdersDTO.getNumberOrderCustomer())
-            .customer(customer)
-            .supplier(supplier)
-            .docStatus(deliveryOrdersDTO.getDocStatus())
-            .docTotal(deliveryOrdersDTO.getDocTotal())
-            .docNet(deliveryOrdersDTO.getDocNet())
-            .docVatSum(deliveryOrdersDTO.getDocVatSum())
-            .description(deliveryOrdersDTO.getDescription())
-            .detailsDeliveryOrdersList(deliveryOrdersDTO.getDetailsDeliveryOrdersList())
-            .build();
+  public DeliveryOrders (String baseRef, String numberOrderCustomer)
+  {
+    this.baseRef = baseRef;
+    this.numberOrderCustomer = numberOrderCustomer;
   }
+
+  public DeliveryOrders (DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier){
+    List<DetailsDeliveryOrders> list = new ArrayList<>();
+    for (DeliveryOrdersDTO.DetailsDeliveryOrdersList deliveryOrdersList: deliveryOrdersDTO.getDetailsDeliveryOrdersList()
+         ) {
+      list.add(DetailsDeliveryOrders.toDetailsDeliveryOrders(deliveryOrdersList));
+    }
+    this.baseRef = deliveryOrdersDTO.getBaseRef();
+    this.numberOrderCustomer = deliveryOrdersDTO.getNumberOrderCustomer();
+    this.docStatus = 'O';
+    this.customer = customer;
+    this.supplier = supplier;
+    this.docTotal = deliveryOrdersDTO.getDocTotal();
+    this.docNet = deliveryOrdersDTO.getDocNet();
+    this.docVatSum = deliveryOrdersDTO.getDocVatSum();
+    this.description = deliveryOrdersDTO.getDescription();
+    this.detailsDeliveryOrdersList = list;
+  }
+
 
 }

@@ -22,9 +22,9 @@ public class DeliveryOrdersDTO {
 
   private char DocStatus;
 
-  private UserSDTO supplier;
+  private UsersDTO supplier;
 
-  private UserSDTO customer;
+  private UsersDTO customer;
 
   private double docTotal;
 
@@ -37,16 +37,12 @@ public class DeliveryOrdersDTO {
   private List<DetailsDeliveryOrdersList> detailsDeliveryOrdersList;
 
   @Getter
-  @Setter
-  @ToString
-  static class UserSDTO {
-    long id;
+  public static class UsersDTO {
+    long userId;
   }
 
   @Getter
-  @Setter
-  @ToString
-  static class DetailsDeliveryOrdersList {
+  public static class DetailsDeliveryOrdersList {
     String itemCode;
     String itemName;
     Double quantity;
@@ -57,7 +53,7 @@ public class DeliveryOrdersDTO {
     double valueNet;
     double valueVat;
     String discountPercent;
-    String vatPercent;
+    double vatPercent;
     String scheduledShipDate;
   }
 }
