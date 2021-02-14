@@ -1,5 +1,6 @@
 package com.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
@@ -61,15 +62,19 @@ public class Users {
     this.role = role;
   }
 
-//  @OneToMany(mappedBy = "user", orphanRemoval = true)
-//  @JsonManagedReference
-//  private List<DeliveryOrders> deliveryOrdersList;
+  @OneToMany(mappedBy = "customer", orphanRemoval = true)
+  @JsonBackReference
+  private List<DeliveryOrders> deliveryOrdersList;
 
-//  @OneToMany(mappedBy = "supplier", orphanRemoval = true)
-//  @JsonManagedReference
-//  private List<RelationsUsers> relationsList1;
-//
-//  @OneToMany(mappedBy = "customer", orphanRemoval = true)
-//  @JsonManagedReference
-//  private List<RelationsUsers> relationsList2;
+  @OneToMany(mappedBy = "supplier", orphanRemoval = true)
+  @JsonBackReference
+  private List<DeliveryOrders> deliveryOrdersList2;
+
+  @OneToMany(mappedBy = "supplier", orphanRemoval = true)
+  @JsonBackReference
+  private List<RelationsUsers> relationsList1;
+
+  @OneToMany(mappedBy = "customer", orphanRemoval = true)
+  @JsonBackReference
+  private List<RelationsUsers> relationsList2;
 }

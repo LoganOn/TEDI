@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 public class RelationsUsers {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "RelationUsersId")
   private Long relationUsersId;
 
@@ -36,9 +36,17 @@ public class RelationsUsers {
   @Column(name = "Active")
   private Boolean active;
 
-  @Column(name = "CreationDate",  nullable = false)
-  private Timestamp creationDate = new Timestamp(System.currentTimeMillis());
+  @Column(name = "CreationDate", nullable = false)
+  private Timestamp creationDate;
 
-  @Column(name = "ModifyDate",  nullable = false)
-  private Timestamp modifyDate = new Timestamp(System.currentTimeMillis());
+  @Column(name = "ModifyDate", nullable = false)
+  private Timestamp modifyDate;
+
+  public RelationsUsers(Users supplier, Users customer, boolean active) {
+    this.supplier = supplier;
+    this.customer = customer;
+    this.active = active;
+    this.creationDate = new Timestamp(System.currentTimeMillis());
+    this.modifyDate = new Timestamp(System.currentTimeMillis());
+  }
 }

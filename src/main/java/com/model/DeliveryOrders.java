@@ -1,11 +1,12 @@
 package com.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.handler.DeliveryOrdersDTO;
 import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,7 +18,7 @@ import java.util.List;
 public class DeliveryOrders {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "DeliveryOrderId")
   private Long deliveryOrderId;
 
@@ -60,6 +61,24 @@ public class DeliveryOrders {
   private Timestamp modifyDate = new Timestamp(System.currentTimeMillis());
 
   @OneToMany(mappedBy = "deliveryOrder", orphanRemoval = true)
-  @JsonBackReference
+  @JsonManagedReference
   private List<DetailsDeliveryOrders> detailsDeliveryOrdersList;
+
+  public DeliveryOrders (DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier){
+    List<DetailsDeliveryOrders> list = new ArrayList<>();
+    for (DeliveryOrdersDTO.DetailsDeliveryOrdersList deliveryOrdersList: deliveryOrdersDTO.getDetailsDeliveryOrdersList()
+         ) {
+      list.add(DetailsDeliveryOrders.toDetailsDeliveryOrders(deliveryOrdersList));
+    }
+    this.baseRef = deliveryOrdersDTO.getBaseRef();
+    this.numberOrderCustomer = deliveryOrdersDTO.getNumberOrderCustomer();
+    this.docStatus = 'O';
+    this.customer = customer;
+    this.supplier = supplier;
+    this.docTotal = deliveryOrdersDTO.getDocTotal();
+    this.docNet = deliveryOrdersDTO.getDocNet();
+    this.docVatSum = deliveryOrdersDTO.getDocVatSum();
+    this.description = deliveryOrdersDTO.getDescription();
+    this.detailsDeliveryOrdersList = list;
+  }
 }

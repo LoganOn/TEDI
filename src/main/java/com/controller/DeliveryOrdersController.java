@@ -1,14 +1,17 @@
 package com.controller;
 
+import com.exception.BadRequestException;
 import com.handler.DeliveryOrdersDTO;
 import com.model.DeliveryOrders;
 import com.model.MinimalInfo;
+import com.model.Users;
 import com.repository.DeliveryOrdersRepository;
+import com.repository.DetailsDeliveryOrderRepository;
 import com.repository.UsersRepository;
+import com.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +20,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/api/delivery", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/delivery", produces = "application/json")
 @AllArgsConstructor
 public class DeliveryOrdersController {
 
+  private final String USER_NOT_EXIST = "Customer or supplier not exist";
+
+  private final String USER_IS_THE_SAME= "Customer and supplier cannot be the same";
+
   private final DeliveryOrdersRepository deliveryOrdersRepository;
+
+  private final OrderService orderService;
 
   private final UsersRepository usersRepository;
 
@@ -119,6 +128,23 @@ public class DeliveryOrdersController {
             deliveryOrders, deliveryOrders == null ?
             HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
             HttpStatus.NO_CONTENT : HttpStatus.OK
+    );
+  }
+
+  @PostMapping(consumes = "application/json")
+  public ResponseEntity addDeliveryOrders(@RequestBody DeliveryOrdersDTO deliveryOrdersDTO) {
+    Integer id = deliveryOrdersRepository.findAll().size() + 1;
+    Optional<Users> customer = usersRepository.findById(deliveryOrdersDTO.getCustomer().getUserId());
+    Optional<Users> supplier = usersRepository.findById(deliveryOrdersDTO.getSupplier().getUserId());
+    if (customer.isEmpty() || supplier.isEmpty())
+      throw new BadRequestException(USER_NOT_EXIST);
+    if (customer.equals(supplier))
+      throw new BadRequestException(USER_IS_THE_SAME);
+    orderService.save(deliveryOrdersDTO, customer.get(), supplier.get());
+    return new ResponseEntity<>(
+            id, id == null ?
+            HttpStatus.NOT_FOUND : id == 0 ?
+            HttpStatus.NO_CONTENT : HttpStatus.CREATED
     );
   }
 }
