@@ -42,19 +42,7 @@ public class DeliveryOrdersDTO {
   }
 
   @Getter
-  public static class DetailsDeliveryOrdersList {
-    String itemCode;
-    String itemName;
-    Double quantity;
-    String codeBars;
-    double price;
-    String currency;
-    double valueTotal;
-    double valueNet;
-    double valueVat;
-    String discountPercent;
-    double vatPercent;
-    String scheduledShipDate;
+  public static class DetailsDeliveryOrdersList extends BasicDetailsDeliveryOrderDTO {
   }
 }
 

@@ -2,7 +2,8 @@ package com.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.handler.DeliveryOrdersDTO;
+import com.handler.BasicDetailsDeliveryOrderDTO;
+import com.handler.DetailsDeliveryOrderDTO;
 import lombok.*;
 
 import javax.persistence.*;
@@ -14,7 +15,6 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @Builder
-@ToString
 public class DetailsDeliveryOrders {
 
   @Id
@@ -89,25 +89,36 @@ public class DetailsDeliveryOrders {
   private String comments;
 
   @Column(name = "CreationDate", nullable = false)
-  private Timestamp creationDate = new Timestamp(System.currentTimeMillis());
+  private Timestamp creationDate;
 
   @Column(name = "ModifyDate", nullable = false)
-  private Timestamp modifyDate = new Timestamp(System.currentTimeMillis());
+  private Timestamp modifyDate;
 
-  public static DetailsDeliveryOrders toDetailsDeliveryOrders (DeliveryOrdersDTO.DetailsDeliveryOrdersList deliveryOrdersList){
+  public void setParametrs(DeliveryOrders deliveryOrders) {
+    this.deliveryOrder = deliveryOrders;
+    this.baseRef = deliveryOrders.getBaseRef();
+    this.supplier = deliveryOrders.getSupplier();
+    this.customer = deliveryOrders.getCustomer();
+    this.creationDate = new Timestamp(System.currentTimeMillis());
+    this.modifyDate = new Timestamp(System.currentTimeMillis());
+    this.active = true;
+    this.onTheWay = false;
+  }
+
+  public static DetailsDeliveryOrders toDetailsDeliveryOrders(BasicDetailsDeliveryOrderDTO deliveryOrdersList) {
     return DetailsDeliveryOrders.builder()
-      .itemCode(deliveryOrdersList.getItemCode())
-      .itemName(deliveryOrdersList.getItemName())
-      .quantity(deliveryOrdersList.getQuantity())
-      .codeBars(deliveryOrdersList.getCodeBars())
-      .price(deliveryOrdersList.getPrice())
-      .currency(deliveryOrdersList.getCurrency())
-      .lineTotal(deliveryOrdersList.getValueTotal())
-      .lineNet(deliveryOrdersList.getValueNet())
-      .lineVat(deliveryOrdersList.getValueVat())
-      .discountPrcnt(deliveryOrdersList.getDiscountPercent())
-      .vatPrcnt(deliveryOrdersList.getVatPercent())
-      .scheduledShipDate(deliveryOrdersList.getScheduledShipDate())
+            .itemCode(deliveryOrdersList.getItemCode())
+            .itemName(deliveryOrdersList.getItemName())
+            .quantity(deliveryOrdersList.getQuantity())
+            .codeBars(deliveryOrdersList.getCodeBars())
+            .price(deliveryOrdersList.getPrice())
+            .currency(deliveryOrdersList.getCurrency())
+            .lineTotal(deliveryOrdersList.getValueTotal())
+            .lineNet(deliveryOrdersList.getValueNet())
+            .lineVat(deliveryOrdersList.getValueVat())
+            .discountPrcnt(deliveryOrdersList.getDiscountPercent())
+            .vatPrcnt(deliveryOrdersList.getVatPercent())
+            .scheduledShipDate(deliveryOrdersList.getScheduledShipDate())
             .build();
   }
 }

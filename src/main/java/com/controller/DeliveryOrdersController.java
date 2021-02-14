@@ -1,10 +1,12 @@
 package com.controller;
 
+import com.exception.BadRequestException;
 import com.handler.DeliveryOrdersDTO;
 import com.model.DeliveryOrders;
 import com.model.MinimalInfo;
 import com.model.Users;
 import com.repository.DeliveryOrdersRepository;
+import com.repository.DetailsDeliveryOrderRepository;
 import com.repository.UsersRepository;
 import com.service.OrderService;
 import lombok.AllArgsConstructor;
@@ -17,13 +19,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-//import static com.model.DeliveryOrders.toDeliveryOrders;
-
-
 @RestController
 @RequestMapping(value = "/api/delivery", produces = "application/json")
 @AllArgsConstructor
 public class DeliveryOrdersController {
+
+  private final String USER_NOT_EXIST = "Customer or supplier not exist";
+
+  private final String USER_IS_THE_SAME= "Customer and supplier cannot be the same";
 
   private final DeliveryOrdersRepository deliveryOrdersRepository;
 
@@ -128,17 +131,20 @@ public class DeliveryOrdersController {
     );
   }
 
-    @PostMapping(value="/add" , consumes = "application/json")
-  public ResponseEntity addDeliveryOrders(@RequestBody DeliveryOrdersDTO deliveryOrdersDTO){
-      Integer id = deliveryOrdersRepository.findAll().size() + 1;
-      System.out.println(deliveryOrdersDTO.getDetailsDeliveryOrdersList().get(0));
-      Optional <Users> customer = usersRepository.findById(deliveryOrdersDTO.getCustomer().getUserId());
-      Optional <Users> supplier = usersRepository.findById(deliveryOrdersDTO.getSupplier().getUserId());
-      orderService.save(deliveryOrdersDTO, customer.get(), supplier.get());
-     return new ResponseEntity<>(
-          id, id == null ?
-           HttpStatus.NOT_FOUND : id == 0?
-           HttpStatus.NO_CONTENT : HttpStatus.CREATED
-   );
+  @PostMapping(consumes = "application/json")
+  public ResponseEntity addDeliveryOrders(@RequestBody DeliveryOrdersDTO deliveryOrdersDTO) {
+    Integer id = deliveryOrdersRepository.findAll().size() + 1;
+    Optional<Users> customer = usersRepository.findById(deliveryOrdersDTO.getCustomer().getUserId());
+    Optional<Users> supplier = usersRepository.findById(deliveryOrdersDTO.getSupplier().getUserId());
+    if (customer.isEmpty() || supplier.isEmpty())
+      throw new BadRequestException(USER_NOT_EXIST);
+    if (customer.equals(supplier))
+      throw new BadRequestException(USER_IS_THE_SAME);
+    orderService.save(deliveryOrdersDTO, customer.get(), supplier.get());
+    return new ResponseEntity<>(
+            id, id == null ?
+            HttpStatus.NOT_FOUND : id == 0 ?
+            HttpStatus.NO_CONTENT : HttpStatus.CREATED
+    );
   }
 }
