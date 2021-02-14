@@ -11,4 +11,6 @@ import java.util.List;
 public interface DetailsDeliveryOrderRepository extends CrudRepository<DetailsDeliveryOrders, Long> {
 
   List<DetailsDeliveryOrders> findAllByDeliveryOrder (DeliveryOrders deliveryOrderId);
+
+  List<DetailsDeliveryOrders> findAll();
 }

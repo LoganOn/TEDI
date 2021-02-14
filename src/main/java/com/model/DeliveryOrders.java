@@ -15,7 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class DeliveryOrders {
 
   @Id
@@ -65,12 +64,6 @@ public class DeliveryOrders {
   @JsonManagedReference
   private List<DetailsDeliveryOrders> detailsDeliveryOrdersList;
 
-  public DeliveryOrders (String baseRef, String numberOrderCustomer)
-  {
-    this.baseRef = baseRef;
-    this.numberOrderCustomer = numberOrderCustomer;
-  }
-
   public DeliveryOrders (DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier){
     List<DetailsDeliveryOrders> list = new ArrayList<>();
     for (DeliveryOrdersDTO.DetailsDeliveryOrdersList deliveryOrdersList: deliveryOrdersDTO.getDetailsDeliveryOrdersList()
@@ -88,6 +81,4 @@ public class DeliveryOrders {
     this.description = deliveryOrdersDTO.getDescription();
     this.detailsDeliveryOrdersList = list;
   }
-
-
 }

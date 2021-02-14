@@ -1,9 +1,15 @@
 package com.controller;
 
+import com.exception.BadRequestException;
+import com.handler.BasicDetailsDeliveryOrderDTO;
+import com.handler.DeliveryOrdersDTO;
+import com.handler.DetailsDeliveryOrderDTO;
 import com.model.DeliveryOrders;
 import com.model.DetailsDeliveryOrders;
+import com.model.Users;
 import com.repository.DeliveryOrdersRepository;
 import com.repository.DetailsDeliveryOrderRepository;
+import com.service.DetailService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,9 +28,13 @@ import java.util.Optional;
 @AllArgsConstructor
 public class DetailsDeliveryOrderController {
 
+    private final String DELIVERY_ORDER_NOT_EXIST = "Delivery order not exist";
+
     private DetailsDeliveryOrderRepository detailsDeliveryOrderRepository;
 
     private DeliveryOrdersRepository deliveryOrdersRepository;
+
+    private final DetailService detailService;
 
     @GetMapping("/all")
     @ResponseBody
@@ -43,6 +55,25 @@ public class DetailsDeliveryOrderController {
                 detailsDeliveryOrder, detailsDeliveryOrder == null ?
                 HttpStatus.NOT_FOUND : detailsDeliveryOrder.isEmpty() ?
                 HttpStatus.NO_CONTENT : HttpStatus.OK
+        );
+    }
+
+    @PostMapping(value = "", consumes = "application/json")
+    public ResponseEntity<?> addDetailsDeliveryOrders(@RequestBody DetailsDeliveryOrderDTO detailsDeliveryOrderDTO) {
+        List <Integer> id = new ArrayList<Integer>();
+
+        for (BasicDetailsDeliveryOrderDTO d: detailsDeliveryOrderDTO.getDetailsDeliveryOrders()
+             ) {
+        id.add(detailsDeliveryOrderRepository.findAll().size() + 1);
+        Optional<DeliveryOrders> deliveryOrders = deliveryOrdersRepository.findById(Long.valueOf(detailsDeliveryOrderDTO.getDeliverOrderID()));
+        if (deliveryOrders.isEmpty())
+            throw new BadRequestException(DELIVERY_ORDER_NOT_EXIST);
+        detailService.save(deliveryOrders.get(), d);
+        }
+        return new ResponseEntity<>(
+                id, id == null ?
+                HttpStatus.NOT_FOUND : id.isEmpty()?
+                HttpStatus.NO_CONTENT : HttpStatus.CREATED
         );
     }
 

@@ -14,4 +14,8 @@ public interface RelationsUsersRepository extends CrudRepository<RelationsUsers,
   List<RelationsUsers> findAllBySupplier (Users supplier);
 
   List<RelationsUsers> findAllByCustomer (Users customer);
+
+  List<RelationsUsers> findAll();
+
+  Optional<RelationsUsers> findBySupplierAndCustomer(Users supplier, Users customer);
 }

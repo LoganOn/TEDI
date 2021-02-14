@@ -5,6 +5,7 @@ import com.handler.UserSignupDto;
 import com.model.DeliveryOrders;
 import com.model.Users;
 import com.repository.DeliveryOrdersRepository;
+import com.repository.DetailsDeliveryOrderRepository;
 import com.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,11 +20,17 @@ public class OrderService {
 
 
   private final DeliveryOrdersRepository deliveryOrdersRepository;
+  private final DetailsDeliveryOrderRepository detailsDeliveryOrderRepository;
 
 
   public DeliveryOrders save(DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier){
     DeliveryOrders deliveryOrders = new DeliveryOrders(deliveryOrdersDTO, customer, supplier);
-    return deliveryOrdersRepository.save(deliveryOrders);
+    deliveryOrdersRepository.save(deliveryOrders);
+    deliveryOrders.getDetailsDeliveryOrdersList().forEach(x->{
+      x.setParametrs(deliveryOrders);
+      detailsDeliveryOrderRepository.save(x);
+    });
+    return deliveryOrders;
   }
 
   public DeliveryOrders update(DeliveryOrders deliveryOrders){
