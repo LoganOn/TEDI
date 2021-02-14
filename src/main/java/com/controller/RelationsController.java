@@ -92,11 +92,10 @@ public class RelationsController {
     if (optionalRelationsUsers.isEmpty()) {
       throw new ResourceNotFoundException(RESOURCE_NOT_FOUND);
     }
-    relationsRepository.delete(optionalRelationsUsers.get());
+    relationService.delete(optionalRelationsUsers.get());
     return new ResponseEntity<>(
             optionalRelationsUsers.get().getRelationUsersId(), optionalRelationsUsers.isEmpty() ?
-            HttpStatus.NOT_FOUND : optionalRelationsUsers.isEmpty() ?
-            HttpStatus.NO_CONTENT : HttpStatus.OK
+            HttpStatus.NOT_FOUND : HttpStatus.OK
     );
   }
 }

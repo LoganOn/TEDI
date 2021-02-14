@@ -1,9 +1,11 @@
 package com.controller;
 
 import com.exception.BadRequestException;
+import com.exception.ResourceNotFoundException;
 import com.handler.DeliveryOrdersDTO;
 import com.model.DeliveryOrders;
 import com.model.MinimalInfo;
+import com.model.RelationsUsers;
 import com.model.Users;
 import com.repository.DeliveryOrdersRepository;
 import com.repository.DetailsDeliveryOrderRepository;
@@ -27,6 +29,8 @@ public class DeliveryOrdersController {
   private final String USER_NOT_EXIST = "Customer or supplier not exist";
 
   private final String USER_IS_THE_SAME= "Customer and supplier cannot be the same";
+
+  private final String RESOURCE_NOT_FOUND = "Resource not found";
 
   private final DeliveryOrdersRepository deliveryOrdersRepository;
 
@@ -145,6 +149,19 @@ public class DeliveryOrdersController {
             id, id == null ?
             HttpStatus.NOT_FOUND : id == 0 ?
             HttpStatus.NO_CONTENT : HttpStatus.CREATED
+    );
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deleteDeliveryOrders(@PathVariable Long id) {
+    Optional<DeliveryOrders> optionalDeliveryOrders = deliveryOrdersRepository.findById(id);
+    if (optionalDeliveryOrders.isEmpty()) {
+      throw new ResourceNotFoundException(RESOURCE_NOT_FOUND);
+    }
+    orderService.delete(optionalDeliveryOrders.get());
+    return new ResponseEntity<>(
+            optionalDeliveryOrders.get().getDeliveryOrderId(), optionalDeliveryOrders.isEmpty() ?
+            HttpStatus.NOT_FOUND : HttpStatus.OK
     );
   }
 }

@@ -16,4 +16,8 @@ public class RelationService {
     RelationsUsers relationsUsers = new RelationsUsers(customer, supplier, true);
     return relationsUsersRepository.save(relationsUsers);
   }
+
+  public void delete(RelationsUsers relationsUsers){
+    relationsUsersRepository.delete(relationsUsers);
+  }
 }
