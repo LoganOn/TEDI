@@ -1,6 +1,7 @@
 package com.controller;
 
 import com.exception.BadRequestException;
+import com.exception.ResourceNotFoundException;
 import com.handler.DeliveryOrdersDTO;
 import com.model.DeliveryOrders;
 import com.model.MinimalInfo;
@@ -26,7 +27,9 @@ public class DeliveryOrdersController {
 
   private final String USER_NOT_EXIST = "Customer or supplier not exist";
 
-  private final String USER_IS_THE_SAME= "Customer and supplier cannot be the same";
+  private final String USER_IS_THE_SAME = "Customer and supplier cannot be the same";
+
+  private final String DELIVERY_ORDERS_NOT_EXIST = "Delivery orders not exist";
 
   private final DeliveryOrdersRepository deliveryOrdersRepository;
 
@@ -86,6 +89,7 @@ public class DeliveryOrdersController {
     );
   }
 
+  //TODO sprawdzic ten required
   @GetMapping("/customer/{id1}/supplier/{id2}")
   public ResponseEntity<?> findAllOrdersByCustomerIdAndSupplierId(@PathVariable Long id1, @PathVariable Long id2,
                                                                   @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size) {
@@ -147,4 +151,24 @@ public class DeliveryOrdersController {
             HttpStatus.NO_CONTENT : HttpStatus.CREATED
     );
   }
+
+  @PutMapping(value = "/{id}", consumes = "application/json")
+  public ResponseEntity updateDeliveryOrders(@PathVariable Long id, @RequestBody DeliveryOrdersDTO deliveryOrdersDTO) {
+    Optional<DeliveryOrders> optionalDeliveryOrders = deliveryOrdersRepository.findById(id);
+    if (optionalDeliveryOrders.isEmpty())
+      throw new ResourceNotFoundException(DELIVERY_ORDERS_NOT_EXIST);
+    Optional<Users> customer = usersRepository.findById(deliveryOrdersDTO.getCustomer().getUserId());
+    Optional<Users> supplier = usersRepository.findById(deliveryOrdersDTO.getSupplier().getUserId());
+    if (customer.isEmpty() || supplier.isEmpty())
+      throw new BadRequestException(USER_NOT_EXIST);
+    if (customer.equals(supplier))
+      throw new BadRequestException(USER_IS_THE_SAME);
+    orderService.save(deliveryOrdersDTO, customer.get(), supplier.get());
+    return new ResponseEntity<>(
+            id, id == null ?
+            HttpStatus.NOT_FOUND : id == 0 ?
+            HttpStatus.NO_CONTENT : HttpStatus.CREATED
+    );
+  }
+
 }

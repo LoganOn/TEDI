@@ -8,6 +8,7 @@ import com.repository.DeliveryOrdersRepository;
 import com.repository.DetailsDeliveryOrderRepository;
 import com.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -33,8 +34,10 @@ public class OrderService {
     return deliveryOrders;
   }
 
-  public DeliveryOrders update(DeliveryOrders deliveryOrders){
-    return deliveryOrdersRepository.save(deliveryOrders);
+  public DeliveryOrders update(Optional<DeliveryOrders> optionalDeliveryOrders, DeliveryOrdersDTO deliveryOrdersDTO){
+
+
+    return deliveryOrdersRepository.save(deliveryOrdersDTO);
   }
 
   public void delete(DeliveryOrders deliveryOrders){
