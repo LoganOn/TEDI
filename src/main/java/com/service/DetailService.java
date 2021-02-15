@@ -31,6 +31,10 @@ public class DetailService {
     return detailsDeliveryOrderRepository.save(detailsDeliveryOrders);
   }
 
+  public DetailsDeliveryOrders saveDetails(DetailsDeliveryOrders detailsDeliveryOrders) {
+    return detailsDeliveryOrderRepository.save(detailsDeliveryOrders);
+  }
+
   public DetailsDeliveryOrders updateAll(DeliveryOrders deliveryOrders, DetailsDeliveryOrders detailsDeliveryOrders, DeliveryOrdersDTO.DetailsDeliveryOrdersList detailsDeliveryOrderDTO, Users customer, Users supplier){
     detailsDeliveryOrders.updateDetailsDeliveryOrders(deliveryOrders, detailsDeliveryOrderDTO, customer, supplier);
     return detailsDeliveryOrderRepository.save(detailsDeliveryOrders);
