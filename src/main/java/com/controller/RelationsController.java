@@ -1,55 +1,101 @@
 package com.controller;
 
+import com.exception.ResourceNotFoundException;
+import com.exception.BadRequestException;
+import com.handler.RelationUsersDTO;
 import com.model.RelationsUsers;
+import com.model.Users;
 import com.repository.RelationsUsersRepository;
 import com.repository.UsersRepository;
+import com.service.RelationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/relations", produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
 public class RelationsController {
 
-    private RelationsUsersRepository relationsRepository;
+  private final String RESOURCE_NOT_FOUND = "Resource not found";
 
-    private UsersRepository usersRepository;
+  private final String USER_NOT_EXIST = "Customer or supplier not exist";
 
-    @GetMapping
-    public ResponseEntity<?> findAllRelations() {
-        List<RelationsUsers> relationsList = (List<RelationsUsers>) relationsRepository.findAll();
-        return new ResponseEntity<>(
-                relationsList, relationsList == null ?
-                HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
-                HttpStatus.NO_CONTENT : HttpStatus.OK
-        );
+  private final String USER_IS_THE_SAME = "Customer and supplier cannot be the same";
+
+  private final String RELATIONS_IS_EXIST = "Relations is exist";
+
+  private final RelationsUsersRepository relationsRepository;
+
+  private final UsersRepository usersRepository;
+
+  private final RelationService relationService;
+
+  @GetMapping
+  public ResponseEntity<?> findAllRelations() {
+    List<RelationsUsers> relationsList = (List<RelationsUsers>) relationsRepository.findAll();
+    return new ResponseEntity<>(
+            relationsList, relationsList == null ?
+            HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
+            HttpStatus.NO_CONTENT : HttpStatus.OK
+    );
+  }
+
+  @GetMapping("/customer/{id}")
+  public ResponseEntity<?> findAllRelationsByCustomerId(@PathVariable Long id) {
+    List<RelationsUsers> relationsList = relationsRepository.findAllByCustomer(usersRepository.findById(id).get());
+    return new ResponseEntity<>(
+            relationsList, relationsList == null ?
+            HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
+            HttpStatus.NO_CONTENT : HttpStatus.OK
+    );
+  }
+
+  @GetMapping("/supplier/{id}")
+  public ResponseEntity<?> findAllRelationsBySupplierId(@PathVariable Long id) {
+    List<RelationsUsers> relationsList = relationsRepository.findAllBySupplier(usersRepository.findById(id).get());
+    return new ResponseEntity<>(
+            relationsList, relationsList == null ?
+            HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
+            HttpStatus.NO_CONTENT : HttpStatus.OK
+    );
+  }
+
+  @PostMapping(consumes = "application/json")
+  public ResponseEntity addRelations(@RequestBody RelationUsersDTO relationUsersDTO) {
+    Integer id = relationsRepository.findAll().size() + 1;
+    Optional<Users> customer = usersRepository.findById(Long.valueOf(relationUsersDTO.getCustomerId()));
+    Optional<Users> supplier = usersRepository.findById(Long.valueOf(relationUsersDTO.getSupplierId()));
+    if (customer.isEmpty() || supplier.isEmpty())
+      throw new BadRequestException(USER_NOT_EXIST);
+    if (customer.equals(supplier))
+      throw new BadRequestException(USER_IS_THE_SAME);
+    Optional<RelationsUsers> optional = relationsRepository.findBySupplierAndCustomer(customer.get(), supplier.get());
+    if (optional.isPresent())
+      throw new BadRequestException(RELATIONS_IS_EXIST);
+    relationService.save(customer.get(), supplier.get());
+    return new ResponseEntity<>(
+            id, id == null ?
+            HttpStatus.NOT_FOUND : id == 0 ?
+            HttpStatus.NO_CONTENT : HttpStatus.CREATED
+    );
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> delete(@PathVariable Long id) {
+    Optional<RelationsUsers> optionalRelationsUsers = relationsRepository.findById(id);
+    if (optionalRelationsUsers.isEmpty()) {
+      throw new ResourceNotFoundException(RESOURCE_NOT_FOUND);
     }
-
-    @GetMapping("/customer/{id}")
-    public ResponseEntity<?> findAllRelationsByCustomerId(@PathVariable Long id) {
-        List<RelationsUsers> relationsList = relationsRepository.findAllByCustomer(usersRepository.findById(id).get());
-        return new ResponseEntity<>(
-                relationsList, relationsList == null ?
-                HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
-                HttpStatus.NO_CONTENT : HttpStatus.OK
-        );
-    }
-
-    @GetMapping("/supplier/{id}")
-    public ResponseEntity<?> findAllRelationsBySupplierId(@PathVariable Long id) {
-        List<RelationsUsers> relationsList = relationsRepository.findAllBySupplier(usersRepository.findById(id).get());
-        return new ResponseEntity<>(
-                relationsList, relationsList == null ?
-                HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
-                HttpStatus.NO_CONTENT : HttpStatus.OK
-        );
-    }
+    relationService.delete(optionalRelationsUsers.get());
+    return new ResponseEntity<>(
+            optionalRelationsUsers.get().getRelationUsersId(), optionalRelationsUsers.isEmpty() ?
+            HttpStatus.NOT_FOUND : HttpStatus.OK
+    );
+  }
 }

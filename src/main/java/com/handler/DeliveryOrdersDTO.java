@@ -1,13 +1,18 @@
 package com.handler;
 
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import java.sql.Timestamp;
+import lombok.ToString;
+
+import javax.persistence.Column;
+import java.util.List;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
+@ToString
 public class DeliveryOrdersDTO {
 
   private Long deliveryOrderId;
@@ -18,9 +23,9 @@ public class DeliveryOrdersDTO {
 
   private char DocStatus;
 
-  private String supplier;
+  private UsersDTO supplier;
 
-  private String customer;
+  private UsersDTO customer;
 
   private double docTotal;
 
@@ -30,10 +35,24 @@ public class DeliveryOrdersDTO {
 
   private String description;
 
-  private Timestamp creationDate;
+  private List<DetailsDeliveryOrdersList> detailsDeliveryOrdersList;
 
-  private Timestamp modifyDate;
+  @Getter
+  public static class UsersDTO {
+    long userId;
+  }
+
+  @Getter
+  public static class DetailsDeliveryOrdersList extends BasicDetailsDeliveryOrderDTO {
+
+    private Boolean active;
+
+    private Boolean onTheWay;
+  }
 }
+
+
+
 
 
 
