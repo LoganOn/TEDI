@@ -16,10 +16,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -38,6 +42,8 @@ public class DetailsDeliveryOrderController {
     private final String USER_NOT_EXIST = "Customer or supplier not exist";
 
     private final String USER_IS_THE_SAME = "Customer and supplier cannot be the same";
+
+    private final String OBJECT_IN_BODY = "The PATCH method does not support updating objects";
 
     private final DetailsDeliveryOrderRepository detailsDeliveryOrderRepository;
 
@@ -103,6 +109,30 @@ public class DetailsDeliveryOrderController {
         if (customer.equals(supplier))
             throw new BadRequestException(USER_IS_THE_SAME);
         detailService.update(optionalDeliveryOrders.get(), detailsDeliveryOrdersList, customer.get(), supplier.get());
+        return new ResponseEntity<>(
+                id, id == null ?
+                HttpStatus.NOT_FOUND : id == 0 ?
+                HttpStatus.NO_CONTENT : HttpStatus.OK
+        );
+    }
+
+    @PatchMapping(value = "/{id}", consumes = "application/json")
+    public ResponseEntity updateDetailsDeliveryOrders(@PathVariable Long id, @RequestBody Map<Object, Object> fields) {
+        Optional<DetailsDeliveryOrders> optionalDetailsDeliveryOrders = detailsDeliveryOrderRepository.findById(id);
+        if (optionalDetailsDeliveryOrders.isEmpty())
+            throw new ResourceNotFoundException(DELIVERY_ORDERS_NOT_EXIST);
+        fields.forEach((k,v) -> {
+            if(k.equals("supplier") || k.equals("customer") || k.equals("deliveryOrder")){
+                throw new BadRequestException(OBJECT_IN_BODY);
+            }
+            else{
+                Field field = ReflectionUtils.findField(DetailsDeliveryOrders.class, (String) k);
+                field.setAccessible(true);
+                ReflectionUtils.setField(field, optionalDetailsDeliveryOrders.get(), v);
+            }
+        });
+        optionalDetailsDeliveryOrders.get().setModifyDate(new Timestamp(System.currentTimeMillis()));
+        detailService.saveDetails(optionalDetailsDeliveryOrders.get());
         return new ResponseEntity<>(
                 id, id == null ?
                 HttpStatus.NOT_FOUND : id == 0 ?

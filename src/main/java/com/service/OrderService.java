@@ -34,6 +34,10 @@ public class OrderService {
     return deliveryOrders;
   }
 
+  public DeliveryOrders saveDeliveryOrders(DeliveryOrders deliveryOrders) {
+    return deliveryOrdersRepository.save(deliveryOrders);
+  }
+
   public DeliveryOrders update(Optional<DeliveryOrders> optionalDeliveryOrders, DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier){
     DeliveryOrders deliveryOrders = optionalDeliveryOrders.get();
     deliveryOrders.updateDeliveryOrders(deliveryOrdersDTO, customer, supplier);

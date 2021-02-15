@@ -5,19 +5,21 @@ import com.exception.ResourceNotFoundException;
 import com.handler.DeliveryOrdersDTO;
 import com.model.DeliveryOrders;
 import com.model.MinimalInfo;
-import com.model.RelationsUsers;
 import com.model.Users;
 import com.repository.DeliveryOrdersRepository;
-import com.repository.DetailsDeliveryOrderRepository;
 import com.repository.UsersRepository;
 import com.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,8 @@ public class DeliveryOrdersController {
   private final String DELIVERY_ORDERS_NOT_EXIST = "Delivery orders not exist";
 
   private final String RESOURCE_NOT_FOUND = "Resource not found";
+
+  private final String OBJECT_IN_BODY = "The PATCH method does not support updating objects";
 
   private final DeliveryOrdersRepository deliveryOrdersRepository;
 
@@ -167,6 +171,30 @@ public class DeliveryOrdersController {
     if (customer.equals(supplier))
       throw new BadRequestException(USER_IS_THE_SAME);
     orderService.update(optionalDeliveryOrders, deliveryOrdersDTO, customer.get(), supplier.get());
+    return new ResponseEntity<>(
+            id, id == null ?
+            HttpStatus.NOT_FOUND : id == 0 ?
+            HttpStatus.NO_CONTENT : HttpStatus.OK
+    );
+  }
+
+  @PatchMapping(value = "/{id}", consumes = "application/json")
+  public ResponseEntity updateFieldsDeliveryOrders(@PathVariable Long id, @RequestBody Map<Object, Object> fields) {
+    Optional<DeliveryOrders> optionalDeliveryOrders = deliveryOrdersRepository.findById(id);
+    if (optionalDeliveryOrders.isEmpty())
+      throw new ResourceNotFoundException(DELIVERY_ORDERS_NOT_EXIST);
+    fields.forEach((k,v) -> {
+        if(k.equals("supplier") || k.equals("customer") || k.equals("detailsDeliveryOrdersList")){
+          throw new BadRequestException(OBJECT_IN_BODY);
+        }
+        else{
+        Field field = ReflectionUtils.findField(DeliveryOrders.class, (String) k);
+        field.setAccessible(true);
+        ReflectionUtils.setField(field, optionalDeliveryOrders.get(), v);
+      }
+    });
+    optionalDeliveryOrders.get().setModifyDate(new Timestamp(System.currentTimeMillis()));
+    orderService.saveDeliveryOrders(optionalDeliveryOrders.get());
     return new ResponseEntity<>(
             id, id == null ?
             HttpStatus.NOT_FOUND : id == 0 ?
