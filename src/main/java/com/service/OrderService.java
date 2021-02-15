@@ -19,10 +19,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OrderService {
 
-
   private final DeliveryOrdersRepository deliveryOrdersRepository;
-  private final DetailsDeliveryOrderRepository detailsDeliveryOrderRepository;
 
+  private final DetailsDeliveryOrderRepository detailsDeliveryOrderRepository;
 
   public DeliveryOrders save(DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier){
     DeliveryOrders deliveryOrders = new DeliveryOrders(deliveryOrdersDTO, customer, supplier);
@@ -34,10 +33,10 @@ public class OrderService {
     return deliveryOrders;
   }
 
-  public DeliveryOrders update(Optional<DeliveryOrders> optionalDeliveryOrders, DeliveryOrdersDTO deliveryOrdersDTO){
-
-
-    return deliveryOrdersRepository.save(deliveryOrdersDTO);
+  public DeliveryOrders update(Optional<DeliveryOrders> optionalDeliveryOrders, DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier){
+    DeliveryOrders deliveryOrders = optionalDeliveryOrders.get();
+    deliveryOrders.setDeliveryOrders(deliveryOrdersDTO, customer, supplier);
+    return deliveryOrdersRepository.save(deliveryOrders);
   }
 
   public void delete(DeliveryOrders deliveryOrders){

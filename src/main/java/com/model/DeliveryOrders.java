@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -54,20 +55,20 @@ public class DeliveryOrders {
   @Column(name = "Description")
   private String description;
 
-  @Column(name = "CreationDate",  nullable = false)
+  @Column(name = "CreationDate", nullable = false)
   private Timestamp creationDate = new Timestamp(System.currentTimeMillis());
 
-  @Column(name = "ModifyDate",  nullable = false)
+  @Column(name = "ModifyDate", nullable = false)
   private Timestamp modifyDate = new Timestamp(System.currentTimeMillis());
 
   @OneToMany(mappedBy = "deliveryOrder", orphanRemoval = true)
   @JsonManagedReference
   private List<DetailsDeliveryOrders> detailsDeliveryOrdersList;
 
-  public DeliveryOrders (DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier){
+  public DeliveryOrders(DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier) {
     List<DetailsDeliveryOrders> list = new ArrayList<>();
-    for (DeliveryOrdersDTO.DetailsDeliveryOrdersList deliveryOrdersList: deliveryOrdersDTO.getDetailsDeliveryOrdersList()
-         ) {
+    for (DeliveryOrdersDTO.DetailsDeliveryOrdersList deliveryOrdersList : deliveryOrdersDTO.getDetailsDeliveryOrdersList()
+    ) {
       list.add(DetailsDeliveryOrders.toDetailsDeliveryOrders(deliveryOrdersList));
     }
     this.baseRef = deliveryOrdersDTO.getBaseRef();
@@ -80,5 +81,18 @@ public class DeliveryOrders {
     this.docVatSum = deliveryOrdersDTO.getDocVatSum();
     this.description = deliveryOrdersDTO.getDescription();
     this.detailsDeliveryOrdersList = list;
+  }
+
+  public void setDeliveryOrders(DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier) {
+    this.baseRef = deliveryOrdersDTO.getBaseRef();
+    this.numberOrderCustomer = deliveryOrdersDTO.getNumberOrderCustomer();
+    this.docStatus = deliveryOrdersDTO.getDocStatus();
+    this.customer = customer;
+    this.supplier = supplier;
+    this.docTotal = deliveryOrdersDTO.getDocTotal();
+    this.docNet = deliveryOrdersDTO.getDocNet();
+    this.docVatSum = deliveryOrdersDTO.getDocVatSum();
+    this.description = deliveryOrdersDTO.getDescription();
+    this.modifyDate = new Timestamp(System.currentTimeMillis());
   }
 }

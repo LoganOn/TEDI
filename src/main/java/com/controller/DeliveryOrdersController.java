@@ -163,7 +163,7 @@ public class DeliveryOrdersController {
       throw new BadRequestException(USER_NOT_EXIST);
     if (customer.equals(supplier))
       throw new BadRequestException(USER_IS_THE_SAME);
-    orderService.save(deliveryOrdersDTO, customer.get(), supplier.get());
+    orderService.update(optionalDeliveryOrders, deliveryOrdersDTO, customer.get(), supplier.get());
     return new ResponseEntity<>(
             id, id == null ?
             HttpStatus.NOT_FOUND : id == 0 ?
