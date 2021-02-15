@@ -1,6 +1,7 @@
 package com.controller;
 
 import com.exception.BadRequestException;
+import com.exception.ResourceNotFoundException;
 import com.handler.BasicDetailsDeliveryOrderDTO;
 import com.handler.DeliveryOrdersDTO;
 import com.handler.DetailsDeliveryOrderDTO;
@@ -29,6 +30,8 @@ import java.util.Optional;
 public class DetailsDeliveryOrderController {
 
     private final String DELIVERY_ORDER_NOT_EXIST = "Delivery order not exist";
+
+    private final String RESOURCE_NOT_FOUND = "Resource not found";
 
     private DetailsDeliveryOrderRepository detailsDeliveryOrderRepository;
 
@@ -77,6 +80,18 @@ public class DetailsDeliveryOrderController {
         );
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteDetailsDeliveryOrders(@PathVariable Long id) {
+        Optional<DetailsDeliveryOrders> optionalDeliveryOrders = detailsDeliveryOrderRepository.findById(id);
+        if (optionalDeliveryOrders.isEmpty()) {
+            throw new ResourceNotFoundException(RESOURCE_NOT_FOUND);
+        }
+        detailService.delete(optionalDeliveryOrders.get());
+        return new ResponseEntity<>(
+                optionalDeliveryOrders.get().getId(), optionalDeliveryOrders.isEmpty() ?
+                HttpStatus.NOT_FOUND :  HttpStatus.OK
+        );
+    }
     // TODO findDetailsOrderByItemCode
 }
 

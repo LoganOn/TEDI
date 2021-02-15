@@ -1,7 +1,7 @@
 package com.controller;
 
+import com.exception.ResourceNotFoundException;
 import com.exception.BadRequestException;
-import com.handler.DeliveryOrdersDTO;
 import com.handler.RelationUsersDTO;
 import com.model.RelationsUsers;
 import com.model.Users;
@@ -21,6 +21,8 @@ import java.util.Optional;
 @RequestMapping(value = "/api/relations", produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
 public class RelationsController {
+
+  private final String RESOURCE_NOT_FOUND = "Resource not found";
 
   private final String USER_NOT_EXIST = "Customer or supplier not exist";
 
@@ -74,13 +76,26 @@ public class RelationsController {
     if (customer.equals(supplier))
       throw new BadRequestException(USER_IS_THE_SAME);
     Optional<RelationsUsers> optional = relationsRepository.findBySupplierAndCustomer(customer.get(), supplier.get());
-    if(optional.isPresent())
+    if (optional.isPresent())
       throw new BadRequestException(RELATIONS_IS_EXIST);
     relationService.save(customer.get(), supplier.get());
     return new ResponseEntity<>(
             id, id == null ?
             HttpStatus.NOT_FOUND : id == 0 ?
             HttpStatus.NO_CONTENT : HttpStatus.CREATED
+    );
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> delete(@PathVariable Long id) {
+    Optional<RelationsUsers> optionalRelationsUsers = relationsRepository.findById(id);
+    if (optionalRelationsUsers.isEmpty()) {
+      throw new ResourceNotFoundException(RESOURCE_NOT_FOUND);
+    }
+    relationService.delete(optionalRelationsUsers.get());
+    return new ResponseEntity<>(
+            optionalRelationsUsers.get().getRelationUsersId(), optionalRelationsUsers.isEmpty() ?
+            HttpStatus.NOT_FOUND : HttpStatus.OK
     );
   }
 }

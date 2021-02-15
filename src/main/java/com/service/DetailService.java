@@ -28,7 +28,7 @@ public class DetailService {
     return detailsDeliveryOrderRepository.save(detailsDeliveryOrders);
   }
 
-//  public Iterable<DetailsDeliveryOrders> saveAll(DeliveryOrders deliveryOrder, List<DetailsDeliveryOrderDTO> detailsDeliveryOrderDTO) {
+  //  public Iterable<DetailsDeliveryOrders> saveAll(DeliveryOrders deliveryOrder, List<DetailsDeliveryOrderDTO> detailsDeliveryOrderDTO) {
 //    List<DetailsDeliveryOrders> detailsDeliveryOrders = Collections.emptyList();
 //    detailsDeliveryOrderDTO.forEach(x -> {
 //      detailsDeliveryOrders.add(DetailsDeliveryOrders.toDetailsDeliveryOrders(x));
@@ -45,8 +45,7 @@ public class DetailService {
 //    return deliveryOrdersRepository.save(deliveryOrders);
 //  }
 //
-//  public void delete(DeliveryOrders deliveryOrders){
-//    deliveryOrdersRepository.delete(deliveryOrders);
-//  }
-
+  public void delete(DetailsDeliveryOrders detailsDeliveryOrders) {
+    detailsDeliveryOrderRepository.delete(detailsDeliveryOrders);
+  }
 }
