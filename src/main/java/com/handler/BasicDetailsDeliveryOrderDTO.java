@@ -11,6 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BasicDetailsDeliveryOrderDTO {
 
+  private Long detailsId;
+
   private String itemCode;
 
   private String itemName;

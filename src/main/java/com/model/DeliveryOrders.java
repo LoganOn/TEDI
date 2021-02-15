@@ -83,7 +83,7 @@ public class DeliveryOrders {
     this.detailsDeliveryOrdersList = list;
   }
 
-  public void setDeliveryOrders(DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier) {
+  public void updateDeliveryOrders(DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier) {
     this.baseRef = deliveryOrdersDTO.getBaseRef();
     this.numberOrderCustomer = deliveryOrdersDTO.getNumberOrderCustomer();
     this.docStatus = deliveryOrdersDTO.getDocStatus();
