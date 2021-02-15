@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.Column;
 import java.util.List;
 
 @Getter
@@ -43,6 +44,10 @@ public class DeliveryOrdersDTO {
 
   @Getter
   public static class DetailsDeliveryOrdersList extends BasicDetailsDeliveryOrderDTO {
+
+    private Boolean active;
+
+    private Boolean onTheWay;
   }
 }
 

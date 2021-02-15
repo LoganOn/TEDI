@@ -1,15 +1,12 @@
 package com.service;
 
 import com.handler.DeliveryOrdersDTO;
-import com.handler.UserSignupDto;
 import com.model.DeliveryOrders;
 import com.model.DetailsDeliveryOrders;
 import com.model.Users;
 import com.repository.DeliveryOrdersRepository;
 import com.repository.DetailsDeliveryOrderRepository;
-import com.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 
@@ -37,8 +34,18 @@ public class OrderService {
     return deliveryOrders;
   }
 
-  public DeliveryOrders update(DeliveryOrders deliveryOrders) {
-    return deliveryOrdersRepository.save(deliveryOrders);
+  public DeliveryOrders update(Optional<DeliveryOrders> optionalDeliveryOrders, DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier){
+    DeliveryOrders deliveryOrders = optionalDeliveryOrders.get();
+    deliveryOrders.updateDeliveryOrders(deliveryOrdersDTO, customer, supplier);
+    deliveryOrdersRepository.save(deliveryOrders);
+    if( deliveryOrdersDTO.getDetailsDeliveryOrdersList() != null && !deliveryOrdersDTO.getDetailsDeliveryOrdersList().isEmpty()) {
+      deliveryOrdersDTO.getDetailsDeliveryOrdersList().forEach(x -> {
+        Optional<DetailsDeliveryOrders> detailsDeliveryOrders = detailsDeliveryOrderRepository.findById(x.getDetailsId());
+        if (detailsDeliveryOrders.isPresent())
+          detailService.updateAll(deliveryOrders, detailsDeliveryOrders.get(), x, customer, supplier);
+      });
+    }
+    return deliveryOrders;
   }
 
   public void delete(DeliveryOrders deliveryOrders) {

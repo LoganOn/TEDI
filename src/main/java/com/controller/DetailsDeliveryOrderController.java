@@ -10,17 +10,15 @@ import com.model.DetailsDeliveryOrders;
 import com.model.Users;
 import com.repository.DeliveryOrdersRepository;
 import com.repository.DetailsDeliveryOrderRepository;
+import com.repository.UsersRepository;
 import com.service.DetailService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,9 +31,19 @@ public class DetailsDeliveryOrderController {
 
     private final String RESOURCE_NOT_FOUND = "Resource not found";
 
-    private DetailsDeliveryOrderRepository detailsDeliveryOrderRepository;
+    private final String DELIVERY_ORDERS_NOT_EXIST = "Delivery orders not exist";
 
-    private DeliveryOrdersRepository deliveryOrdersRepository;
+    private final String DETAILS_DELIVERY_ORDERS_NOT_EXIST = "Details delivery orders not exist";
+
+    private final String USER_NOT_EXIST = "Customer or supplier not exist";
+
+    private final String USER_IS_THE_SAME = "Customer and supplier cannot be the same";
+
+    private final DetailsDeliveryOrderRepository detailsDeliveryOrderRepository;
+
+    private final DeliveryOrdersRepository deliveryOrdersRepository;
+
+    private final UsersRepository usersRepository;
 
     private final DetailService detailService;
 
@@ -76,6 +84,28 @@ public class DetailsDeliveryOrderController {
         return new ResponseEntity<>(
                 id, id == null ?
                 HttpStatus.NOT_FOUND : id.isEmpty()?
+                HttpStatus.NO_CONTENT : HttpStatus.CREATED
+        );
+    }
+
+    @PutMapping(value = "/{id}", consumes = "application/json")
+    public ResponseEntity updateDetailsDeliveryOrders(@PathVariable Long id, @RequestBody DeliveryOrdersDTO.DetailsDeliveryOrdersList detailsDeliveryOrdersList) {
+        Optional<DetailsDeliveryOrders> optionalDetails = detailsDeliveryOrderRepository.findById(id);
+        Optional<DeliveryOrders> optionalDeliveryOrders = deliveryOrdersRepository.findById(id);
+        if (optionalDeliveryOrders.isEmpty())
+            throw new ResourceNotFoundException(DELIVERY_ORDERS_NOT_EXIST);
+        if (optionalDetails.isEmpty())
+            throw new ResourceNotFoundException(DETAILS_DELIVERY_ORDERS_NOT_EXIST);
+        Optional<Users> customer = usersRepository.findById(optionalDeliveryOrders.get().getCustomer().getUserId());
+        Optional<Users> supplier = usersRepository.findById(optionalDeliveryOrders.get().getSupplier().getUserId());
+        if (customer.isEmpty() || supplier.isEmpty())
+            throw new BadRequestException(USER_NOT_EXIST);
+        if (customer.equals(supplier))
+            throw new BadRequestException(USER_IS_THE_SAME);
+        detailService.update(optionalDeliveryOrders.get(), detailsDeliveryOrdersList, customer.get(), supplier.get());
+        return new ResponseEntity<>(
+                id, id == null ?
+                HttpStatus.NOT_FOUND : id == 0 ?
                 HttpStatus.NO_CONTENT : HttpStatus.CREATED
         );
     }

@@ -3,6 +3,7 @@ package com.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.handler.BasicDetailsDeliveryOrderDTO;
+import com.handler.DeliveryOrdersDTO;
 import com.handler.DetailsDeliveryOrderDTO;
 import lombok.*;
 
@@ -105,20 +106,42 @@ public class DetailsDeliveryOrders {
     this.onTheWay = false;
   }
 
-  public static DetailsDeliveryOrders toDetailsDeliveryOrders(BasicDetailsDeliveryOrderDTO deliveryOrdersList) {
+  public static DetailsDeliveryOrders toDetailsDeliveryOrders(BasicDetailsDeliveryOrderDTO details) {
     return DetailsDeliveryOrders.builder()
-            .itemCode(deliveryOrdersList.getItemCode())
-            .itemName(deliveryOrdersList.getItemName())
-            .quantity(deliveryOrdersList.getQuantity())
-            .codeBars(deliveryOrdersList.getCodeBars())
-            .price(deliveryOrdersList.getPrice())
-            .currency(deliveryOrdersList.getCurrency())
-            .lineTotal(deliveryOrdersList.getValueTotal())
-            .lineNet(deliveryOrdersList.getValueNet())
-            .lineVat(deliveryOrdersList.getValueVat())
-            .discountPrcnt(deliveryOrdersList.getDiscountPercent())
-            .vatPrcnt(deliveryOrdersList.getVatPercent())
-            .scheduledShipDate(deliveryOrdersList.getScheduledShipDate())
+            .itemCode(details.getItemCode())
+            .itemName(details.getItemName())
+            .quantity(details.getQuantity())
+            .codeBars(details.getCodeBars())
+            .price(details.getPrice())
+            .currency(details.getCurrency())
+            .lineTotal(details.getValueTotal())
+            .lineNet(details.getValueNet())
+            .lineVat(details.getValueVat())
+            .discountPrcnt(details.getDiscountPercent())
+            .vatPrcnt(details.getVatPercent())
+            .scheduledShipDate(details.getScheduledShipDate())
             .build();
+  }
+
+  public void updateDetailsDeliveryOrders(DeliveryOrders deliveryOrders, DeliveryOrdersDTO.DetailsDeliveryOrdersList details, Users customer, Users supplier){
+    this.deliveryOrder = deliveryOrders;
+    this.baseRef = deliveryOrders.getBaseRef();
+    this.customer = customer;
+    this.supplier = supplier;
+    this.itemCode = details.getItemCode();
+    this.itemName = details.getItemName();
+    this.quantity = details.getQuantity();
+    this.codeBars = details.getCodeBars();
+    this.price = details.getPrice();
+    this.currency = details.getCurrency();
+    this.lineTotal = details.getValueTotal();
+    this.lineNet = details.getValueNet();
+    this.lineVat = details.getValueVat();
+    this.discountPrcnt = details.getDiscountPercent();
+    this.vatPrcnt = details.getVatPercent();
+    this.scheduledShipDate = details.getScheduledShipDate();
+    this.active = details.getActive();
+    this.onTheWay = details.getOnTheWay();
+    this.modifyDate = new Timestamp(System.currentTimeMillis());
   }
 }

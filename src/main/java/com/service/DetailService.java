@@ -1,9 +1,11 @@
 package com.service;
 
 import com.handler.BasicDetailsDeliveryOrderDTO;
+import com.handler.DeliveryOrdersDTO;
 import com.handler.DetailsDeliveryOrderDTO;
 import com.model.DeliveryOrders;
 import com.model.DetailsDeliveryOrders;
+import com.model.Users;
 import com.repository.DetailsDeliveryOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.swing.plaf.basic.BasicArrowButton;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Component
@@ -28,23 +31,17 @@ public class DetailService {
     return detailsDeliveryOrderRepository.save(detailsDeliveryOrders);
   }
 
-  //  public Iterable<DetailsDeliveryOrders> saveAll(DeliveryOrders deliveryOrder, List<DetailsDeliveryOrderDTO> detailsDeliveryOrderDTO) {
-//    List<DetailsDeliveryOrders> detailsDeliveryOrders = Collections.emptyList();
-//    detailsDeliveryOrderDTO.forEach(x -> {
-//      detailsDeliveryOrders.add(DetailsDeliveryOrders.toDetailsDeliveryOrders(x));
-//    });
-//    detailsDeliveryOrders.forEach(x -> {
-//      x.setParametrs(deliveryOrder);
-//    });
-//
-//    System.out.println(detailsDeliveryOrders.get(0).toString());
-//    return detailsDeliveryOrderRepository.saveAll(detailsDeliveryOrders);
-//  }
-//-
-//  public DeliveryOrders update(DeliveryOrders deliveryOrders){
-//    return deliveryOrdersRepository.save(deliveryOrders);
-//  }
-//
+  public DetailsDeliveryOrders updateAll(DeliveryOrders deliveryOrders, DetailsDeliveryOrders detailsDeliveryOrders, DeliveryOrdersDTO.DetailsDeliveryOrdersList detailsDeliveryOrderDTO, Users customer, Users supplier){
+    detailsDeliveryOrders.updateDetailsDeliveryOrders(deliveryOrders, detailsDeliveryOrderDTO, customer, supplier);
+    return detailsDeliveryOrderRepository.save(detailsDeliveryOrders);
+  }
+
+  public DetailsDeliveryOrders update(DeliveryOrders deliveryOrders, DeliveryOrdersDTO.DetailsDeliveryOrdersList detailsDeliveryOrders, Users customer, Users supplier){
+    Optional<DetailsDeliveryOrders> optionalDetailsDeliveryOrders = detailsDeliveryOrderRepository.findById(detailsDeliveryOrders.getDetailsId());
+    optionalDetailsDeliveryOrders.get().updateDetailsDeliveryOrders(deliveryOrders, detailsDeliveryOrders, customer, supplier);
+    return detailsDeliveryOrderRepository.save(optionalDetailsDeliveryOrders.get());
+  }
+
   public void delete(DetailsDeliveryOrders detailsDeliveryOrders) {
     detailsDeliveryOrderRepository.delete(detailsDeliveryOrders);
   }
