@@ -12,8 +12,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -51,7 +53,8 @@ public class SecuritySettings extends WebSecurityConfigurerAdapter {
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins(
-                        "http://localhost:3000"
+                        "http://localhost:3000",
+                        "http://localhost:3000/api/logout"
                 )
                 .allowCredentials(true)
                 .allowedHeaders("*")
@@ -73,7 +76,16 @@ public class SecuritySettings extends WebSecurityConfigurerAdapter {
     http.csrf().disable()
             .anonymous().authorities("ROLE_ANONYMOUS")
             .and()
+            .logout().logoutUrl("/api/logout")
+            .addLogoutHandler(new HeaderWriterLogoutHandler(
+                    new ClearSiteDataHeaderWriter(
+                            ClearSiteDataHeaderWriter.Directive.CACHE,
+                            ClearSiteDataHeaderWriter.Directive.COOKIES,
+                            ClearSiteDataHeaderWriter.Directive.STORAGE))
+                    )
+            .and()
             .authorizeRequests().antMatchers(HttpMethod.OPTIONS,"*/").permitAll()
-            .antMatchers(HttpMethod.POST,"/login").permitAll();
+            .antMatchers(HttpMethod.POST,"/api/login").permitAll()
+            .antMatchers(HttpMethod.POST,"/api/logout").permitAll();
   }
 }
