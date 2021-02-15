@@ -9,6 +9,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -94,6 +95,14 @@ public class DetailsDeliveryOrders {
 
   @Column(name = "ModifyDate", nullable = false)
   private Timestamp modifyDate;
+
+  @OneToMany(mappedBy = "detailsDeliveryOrders", orphanRemoval = true)
+  @JsonBackReference
+  private List<Subscriptions> subscriptions;
+
+  @OneToMany(mappedBy = "detailsDeliveryOrders", orphanRemoval = true)
+  @JsonBackReference
+  private List<Notifications> notifications;
 
   public void setParametrs(DeliveryOrders deliveryOrders) {
     this.deliveryOrder = deliveryOrders;

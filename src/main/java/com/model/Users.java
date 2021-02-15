@@ -77,4 +77,8 @@ public class Users {
   @OneToMany(mappedBy = "customer", orphanRemoval = true)
   @JsonBackReference
   private List<RelationsUsers> relationsList2;
+
+  @OneToMany(mappedBy = "customer", orphanRemoval = true)
+  @JsonBackReference
+  private List<Subscriptions> subscriptions;
 }
