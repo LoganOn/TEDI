@@ -84,7 +84,7 @@ public class DetailsDeliveryOrderController {
         return new ResponseEntity<>(
                 id, id == null ?
                 HttpStatus.NOT_FOUND : id.isEmpty()?
-                HttpStatus.NO_CONTENT : HttpStatus.CREATED
+                HttpStatus.NO_CONTENT : HttpStatus.OK
         );
     }
 
@@ -106,7 +106,7 @@ public class DetailsDeliveryOrderController {
         return new ResponseEntity<>(
                 id, id == null ?
                 HttpStatus.NOT_FOUND : id == 0 ?
-                HttpStatus.NO_CONTENT : HttpStatus.CREATED
+                HttpStatus.NO_CONTENT : HttpStatus.OK
         );
     }
 

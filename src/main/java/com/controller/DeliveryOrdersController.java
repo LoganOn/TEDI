@@ -151,7 +151,7 @@ public class DeliveryOrdersController {
     return new ResponseEntity<>(
             id, id == null ?
             HttpStatus.NOT_FOUND : id == 0 ?
-            HttpStatus.NO_CONTENT : HttpStatus.CREATED
+            HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }
 
@@ -170,7 +170,7 @@ public class DeliveryOrdersController {
     return new ResponseEntity<>(
             id, id == null ?
             HttpStatus.NOT_FOUND : id == 0 ?
-            HttpStatus.NO_CONTENT : HttpStatus.CREATED
+            HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }
 
