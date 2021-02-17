@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.catalina.User;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -32,6 +33,11 @@ public class Notifications {
   @JsonManagedReference
   private DetailsDeliveryOrders detailsDeliveryOrders;
 
+  @ManyToOne
+  @JoinColumn(name = "UserCustomerId")
+  @JsonManagedReference
+  private Users customer;
+
   @Column(name = "Content")
   private String content;
 
@@ -40,4 +46,13 @@ public class Notifications {
 
   @Column(name = "CreationDate")
   private Timestamp creationDate;
+
+  public Notifications(DeliveryOrders deliveryOrders, DetailsDeliveryOrders detailsDeliveryOrders, Users customer, String content, boolean readed, Timestamp creationDate) {
+    this.deliveryOrders = deliveryOrders;
+    this.detailsDeliveryOrders = detailsDeliveryOrders;
+    this.customer = customer;
+    this.content = content;
+    this.readed = readed;
+    this.creationDate = creationDate;
+  }
 }

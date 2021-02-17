@@ -37,6 +37,8 @@ public class Subscriptions {
   @JsonManagedReference
   private Users customer;
 
+  private Boolean email;
+
   @Column(name = "CreationDate")
   private Timestamp creationDate;
 }

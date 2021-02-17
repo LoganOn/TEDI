@@ -15,4 +15,6 @@ public interface UsersRepository extends CrudRepository<Users, Long> {
   boolean existsByEmail(String email);
 
   List<Users> findAllByNameContaining (String name);
+
+  List<Users> findByNotificationTrue();
 }

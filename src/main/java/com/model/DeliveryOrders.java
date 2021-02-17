@@ -9,7 +9,6 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Getter
@@ -73,6 +72,8 @@ public class DeliveryOrders {
   @OneToMany(mappedBy = "deliveryOrders", orphanRemoval = true)
   @JsonBackReference
   private List<Notifications> notifications;
+
+  private String type;
 
   public DeliveryOrders(DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier) {
     List<DetailsDeliveryOrders> list = new ArrayList<>();

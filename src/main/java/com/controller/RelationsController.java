@@ -55,10 +55,29 @@ public class RelationsController {
             HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }
+  @GetMapping("/customer/without/{id}")
+  public ResponseEntity<?> findAllWithoutRelationsByCustomerId(@PathVariable Long id) {
+    List<RelationsUsers> relationsList = relationsRepository.findByCustomerNot(usersRepository.findById(id).get());
+    return new ResponseEntity<>(
+            relationsList, relationsList == null ?
+            HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
+            HttpStatus.NO_CONTENT : HttpStatus.OK
+    );
+  }
 
   @GetMapping("/supplier/{id}")
   public ResponseEntity<?> findAllRelationsBySupplierId(@PathVariable Long id) {
     List<RelationsUsers> relationsList = relationsRepository.findAllBySupplier(usersRepository.findById(id).get());
+    return new ResponseEntity<>(
+            relationsList, relationsList == null ?
+            HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
+            HttpStatus.NO_CONTENT : HttpStatus.OK
+    );
+  }
+
+  @GetMapping("/supplier/without/{id}")
+  public ResponseEntity<?> findAllWithoutRelationsBySupplierId(@PathVariable Long id) {
+    List<RelationsUsers> relationsList = relationsRepository.findBySupplierNot(usersRepository.findById(id).get());
     return new ResponseEntity<>(
             relationsList, relationsList == null ?
             HttpStatus.NOT_FOUND : relationsList.isEmpty() ?

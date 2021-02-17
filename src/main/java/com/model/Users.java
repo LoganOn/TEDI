@@ -17,7 +17,7 @@ import java.util.List;
 public class Users {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "UserId")
   private Long userId;
 
@@ -53,6 +53,9 @@ public class Users {
 
   @Column(name = "Active")
   private Boolean active;
+
+  @Column(name = "Notification")
+  private Boolean notification;
 
   public Users(String name, String email, String password, String phone, String role) {
     this.name = name;

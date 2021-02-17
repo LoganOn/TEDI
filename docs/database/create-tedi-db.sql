@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `CreationDate` Timestamp NOT NULL,
   `UserVerified` boolean,
   `Active` boolean,
+  `Notification` boolean,
   PRIMARY KEY (`UserId`)
 );
 
@@ -90,10 +91,13 @@ CREATE TABLE IF NOT EXISTS `Notifications` (
   `NotificationId` Integer NOT NULL AUTO_INCREMENT,
   `DeliveryOrderId` Integer,
   `DetailDeliveryOrderId` Integer,
+  `UserCustomerId` Integer,
   `Content` Text,
   `Readed` boolean,
   `CreationDate` Timestamp NOT NULL,
   PRIMARY KEY (`NotificationId`),
+  FOREIGN KEY (`UserCustomerId`)
+    REFERENCES Users(UserId),
   FOREIGN KEY (`DeliveryOrderId`)
     REFERENCES DeliveryOrders(DeliveryOrderId),
   FOREIGN KEY (`DetailDeliveryOrderId`)
@@ -106,6 +110,7 @@ CREATE TABLE IF NOT EXISTS `Subscriptions` (
   `DetailDeliveryOrderId` Integer,
   `UserCustomerId` Integer,
   `CreationDate` Timestamp NOT NULL,
+  `Email` boolean,
   PRIMARY KEY (`SubscriptionsId`),
   FOREIGN KEY (`DeliveryOrderId`)
     REFERENCES DeliveryOrders(DeliveryOrderId),

@@ -29,20 +29,20 @@ public class NotificationsController {
     );
   }
 
-  @PostMapping(consumes = "application/json")
-  public ResponseEntity addDeliveryOrders(@RequestBody Notifications notifications) {
-    Integer id = notificationsRepository.findAll().size() + 1;
-    Optional<Users> customer = usersRepository.findById(deliveryOrdersDTO.getCustomer().getUserId());
-    Optional<Users> supplier = usersRepository.findById(deliveryOrdersDTO.getSupplier().getUserId());
-    if (customer.isEmpty() || supplier.isEmpty())
-      throw new BadRequestException(USER_NOT_EXIST);
-    if (customer.equals(supplier))
-      throw new BadRequestException(USER_IS_THE_SAME);
-    orderService.save(deliveryOrdersDTO, customer.get(), supplier.get());
-    return new ResponseEntity<>(
-            id, id == null ?
-            HttpStatus.NOT_FOUND : id == 0 ?
-            HttpStatus.NO_CONTENT : HttpStatus.OK
-    );
-  }
+//  @PostMapping(consumes = "application/json")
+//  public ResponseEntity addDeliveryOrders(@RequestBody Notifications notifications) {
+//    Integer id = notificationsRepository.findAll().size() + 1;
+//    Optional<Users> customer = usersRepository.findById(deliveryOrdersDTO.getCustomer().getUserId());
+//    Optional<Users> supplier = usersRepository.findById(deliveryOrdersDTO.getSupplier().getUserId());
+//    if (customer.isEmpty() || supplier.isEmpty())
+//      throw new BadRequestException(USER_NOT_EXIST);
+//    if (customer.equals(supplier))
+//      throw new BadRequestException(USER_IS_THE_SAME);
+//    orderService.save(deliveryOrdersDTO, customer.get(), supplier.get());
+//    return new ResponseEntity<>(
+//            id, id == null ?
+//            HttpStatus.NOT_FOUND : id == 0 ?
+//            HttpStatus.NO_CONTENT : HttpStatus.OK
+//    );
+//  }
 }

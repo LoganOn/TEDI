@@ -1,15 +1,15 @@
 USE tedi_db;
 
 INSERT INTO `Users`
-(`UserId`, `Role`, `Name`, `Phone`, `Email`, `Password`, `ImageUrl`, `Provider`,`ProviderId`, `CreationDate`, `UserVerified`, `Active`)
+(`UserId`, `Role`, `Name`, `Phone`, `Email`, `Password`, `ImageUrl`, `Provider`,`ProviderId`, `CreationDate`, `UserVerified`, `Active`, `Notification`)
 VALUES
-(1, "customer", "Femax", "555666777", "femax@femax.pl", "$2y$11$abnU1/30SXSjOKEmLTiUCOvBs3ksBZ7SyB6n5rUKTLnWj32gPAYAm",null, null, null, NOW(), true, true),
-(2, "customer", "ABC", "444555666", "abc@abc.pl", "$2y$11$p4AoDAFoXEvASKoo8aYckuVzs1kbCRb2nXpF3nvVsbtQzm6BxU2L6",null, null, null, NOW() - INTERVAL 1 WEEK, true, true),
-(3, "customer", "AGD sp zoo", "503444123", "agd@agd.pl", "$2y$11$DCxQT.OL15yxV.wuHURNxuVdtdtUrIX8GO5US9ZtUSL2uHivDaKfW",null, null, null, NOW() - INTERVAL 5 DAY, false, true),
-(4, "supplier", "Terma", "482034578", "terma@terma.pl", "$2y$11$9cQqHcsfaGge0YALp8h...c5CsE4pwx9aBX9npAYeFOWoYQWODhdi", null, null, null, NOW(), true, true),
-(5, "supplier", "Purmo", "482074578", "purmo@purmogroup.com.pl", "$2y$11$IckX.tsW2nrnZRxAPCks4.Lw0yu88lMi8Q9Fcw.QO.Yif1/Ep.98u", null, null, null, NOW() - INTERVAL 1 WEEK, true, true),
-(6, "supplier", "Grohe", "600700800", "grohe@grohe.de", "$2y$11$1XZBKky8YmWnLsZogR9EbOT7TBSTCQrLcDjn5tZ2OS96Rg0gUo5Sq", null, null, null, NOW() - INTERVAL 12 WEEK, true, true),
-(7, "supplier", "TECE", "678876321", "tece@tece.pl", "$2y$11$YAxxcfa.261smiBFvWGE6.QjSPPly.2E9./gFIYyXkESA9L4t0BWS", null, null, null, NOW() - INTERVAL 10 MONTH, true, true);
+(1, "customer", "Femax", "555666777", "femax@femax.pl", "$2y$11$abnU1/30SXSjOKEmLTiUCOvBs3ksBZ7SyB6n5rUKTLnWj32gPAYAm",null, null, null, NOW(), true, true, true),
+(2, "customer", "ABC", "444555666", "abc@abc.pl", "$2y$11$p4AoDAFoXEvASKoo8aYckuVzs1kbCRb2nXpF3nvVsbtQzm6BxU2L6",null, null, null, NOW() - INTERVAL 1 WEEK, true, true,true),
+(3, "customer", "AGD sp zoo", "503444123", "agd@agd.pl", "$2y$11$DCxQT.OL15yxV.wuHURNxuVdtdtUrIX8GO5US9ZtUSL2uHivDaKfW",null, null, null, NOW() - INTERVAL 5 DAY, false, true, true),
+(4, "supplier", "Terma", "482034578", "terma@terma.pl", "$2y$11$9cQqHcsfaGge0YALp8h...c5CsE4pwx9aBX9npAYeFOWoYQWODhdi", null, null, null, NOW(), true, true, true),
+(5, "supplier", "Purmo", "482074578", "purmo@purmogroup.com.pl", "$2y$11$IckX.tsW2nrnZRxAPCks4.Lw0yu88lMi8Q9Fcw.QO.Yif1/Ep.98u", null, null, null, NOW() - INTERVAL 1 WEEK, true, true, true),
+(6, "supplier", "Grohe", "600700800", "grohe@grohe.de", "$2y$11$1XZBKky8YmWnLsZogR9EbOT7TBSTCQrLcDjn5tZ2OS96Rg0gUo5Sq", null, null, null, NOW() - INTERVAL 12 WEEK, true, true, true),
+(7, "supplier", "TECE", "678876321", "tece@tece.pl", "$2y$11$YAxxcfa.261smiBFvWGE6.QjSPPly.2E9./gFIYyXkESA9L4t0BWS", null, null, null, NOW() - INTERVAL 10 MONTH, true, true, true);
 
 INSERT INTO `RelationsUsers`
   (`RelationUsersId`, `UserSupplierId`, `UserCustomerId`, `Active`, `CreationDate`, `ModifyDate`)
