@@ -17,4 +17,6 @@ public interface UsersRepository extends CrudRepository<Users, Long> {
   List<Users> findAllByNameContaining (String name);
 
   List<Users> findByNotificationTrue();
+
+  List<Users> findByRoleNot(String role);
 }

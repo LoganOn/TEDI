@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,12 +56,25 @@ public class RelationsController {
             HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }
+
   @GetMapping("/customer/without/{id}")
   public ResponseEntity<?> findAllWithoutRelationsByCustomerId(@PathVariable Long id) {
-    List<RelationsUsers> relationsList = relationsRepository.findByCustomerNot(usersRepository.findById(id).get());
+    List<Users> usersList = usersRepository.findByRoleNot("customer");
+    List<RelationsUsers> relationsUsersList = relationsRepository.findAllByCustomer(usersRepository.findById(id).get());
+    List<Users> temp = new ArrayList<>();
+    for (Users u : usersList
+    ) {
+      for (RelationsUsers r : relationsUsersList
+      ) {
+        if (r.getSupplier().getUserId() == u.getUserId()) {
+          temp.add(u);
+        }
+      }
+    }
+    usersList.removeAll(temp);
     return new ResponseEntity<>(
-            relationsList, relationsList == null ?
-            HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
+    usersList, usersList == null ?
+            HttpStatus.NOT_FOUND : usersList.isEmpty() ?
             HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }
@@ -77,10 +91,22 @@ public class RelationsController {
 
   @GetMapping("/supplier/without/{id}")
   public ResponseEntity<?> findAllWithoutRelationsBySupplierId(@PathVariable Long id) {
-    List<RelationsUsers> relationsList = relationsRepository.findBySupplierNot(usersRepository.findById(id).get());
+    List<Users> usersList = usersRepository.findByRoleNot("supplier");
+    List<RelationsUsers> relationsUsersList = relationsRepository.findAllBySupplier(usersRepository.findById(id).get());
+    List<Users> temp = new ArrayList<>();
+    for (Users u : usersList
+    ) {
+      for (RelationsUsers r : relationsUsersList
+      ) {
+        if (r.getCustomer().getUserId() == u.getUserId()) {
+          temp.add(u);
+        }
+      }
+    }
+    usersList.removeAll(temp);
     return new ResponseEntity<>(
-            relationsList, relationsList == null ?
-            HttpStatus.NOT_FOUND : relationsList.isEmpty() ?
+            usersList, usersList == null ?
+            HttpStatus.NOT_FOUND : usersList.isEmpty() ?
             HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }
@@ -94,7 +120,7 @@ public class RelationsController {
       throw new BadRequestException(USER_NOT_EXIST);
     if (customer.equals(supplier))
       throw new BadRequestException(USER_IS_THE_SAME);
-    Optional<RelationsUsers> optional = relationsRepository.findBySupplierAndCustomer(customer.get(), supplier.get());
+    Optional<RelationsUsers> optional = relationsRepository.findBySupplierAndCustomer(supplier.get(), customer.get());
     if (optional.isPresent())
       throw new BadRequestException(RELATIONS_IS_EXIST);
     relationService.save(customer.get(), supplier.get());

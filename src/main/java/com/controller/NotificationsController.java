@@ -6,11 +6,13 @@ import com.model.DeliveryOrders;
 import com.model.Notifications;
 import com.model.Users;
 import com.repository.NotificationsRepository;
+import com.repository.UsersRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -20,29 +22,23 @@ public class NotificationsController {
 
   private final NotificationsRepository notificationsRepository;
 
+  private final UsersRepository usersRepository;
+
   @GetMapping("/{id}")
   public ResponseEntity<?> findNotificationById(@PathVariable Long id) {
     Optional<Notifications> notification = notificationsRepository.findById(id);
     return new ResponseEntity<>(
             notification, notification.isEmpty() ?
-            HttpStatus.NOT_FOUND : HttpStatus.OK
+            HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }
 
-//  @PostMapping(consumes = "application/json")
-//  public ResponseEntity addDeliveryOrders(@RequestBody Notifications notifications) {
-//    Integer id = notificationsRepository.findAll().size() + 1;
-//    Optional<Users> customer = usersRepository.findById(deliveryOrdersDTO.getCustomer().getUserId());
-//    Optional<Users> supplier = usersRepository.findById(deliveryOrdersDTO.getSupplier().getUserId());
-//    if (customer.isEmpty() || supplier.isEmpty())
-//      throw new BadRequestException(USER_NOT_EXIST);
-//    if (customer.equals(supplier))
-//      throw new BadRequestException(USER_IS_THE_SAME);
-//    orderService.save(deliveryOrdersDTO, customer.get(), supplier.get());
-//    return new ResponseEntity<>(
-//            id, id == null ?
-//            HttpStatus.NOT_FOUND : id == 0 ?
-//            HttpStatus.NO_CONTENT : HttpStatus.OK
-//    );
-//  }
+  @GetMapping("/users/{id}")
+  public ResponseEntity<?> findNotificationByUserID(@PathVariable Long id) {
+    List<Notifications> notification = notificationsRepository.findByCustomer(usersRepository.findById(id).get());
+    return new ResponseEntity<>(
+            notification, notification.isEmpty() ?
+            HttpStatus.NO_CONTENT : HttpStatus.OK
+    );
+  }
 }

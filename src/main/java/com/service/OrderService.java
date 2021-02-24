@@ -58,6 +58,7 @@ public class OrderService {
           detailService.updateAll(deliveryOrders, detailsDeliveryOrders.get(), x, customer, supplier);
       });
     }
+    eventBus.post(deliveryOrders);
     return deliveryOrders;
   }
 
@@ -70,6 +71,7 @@ public class OrderService {
       }
     }
     deliveryOrders.setType("delete");
+    eventBus.post(deliveryOrders);
     deliveryOrdersRepository.delete(deliveryOrders);
   }
 }

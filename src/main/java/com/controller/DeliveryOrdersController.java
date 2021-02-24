@@ -3,6 +3,7 @@ package com.controller;
 import com.exception.BadRequestException;
 import com.exception.ResourceNotFoundException;
 import com.handler.DeliveryOrdersDTO;
+import com.handler.DeliveryOrdersPage;
 import com.model.DeliveryOrders;
 import com.model.MinimalInfo;
 import com.model.Users;
@@ -50,8 +51,7 @@ public class DeliveryOrdersController {
   public ResponseEntity<?> findOrdersById(@PathVariable Long id) {
     Optional<DeliveryOrders> deliveryOrder = deliveryOrdersRepository.findById(id);
     return new ResponseEntity<>(
-            deliveryOrder, deliveryOrder == null ?
-            HttpStatus.NOT_FOUND : deliveryOrder.isEmpty() ?
+            deliveryOrder, deliveryOrder.isEmpty() ?
             HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }
@@ -65,13 +65,14 @@ public class DeliveryOrdersController {
     int p = page == null ? 0 : page <= 0 ? 0 : page;
     int s = size == null ? SIZE : size <= 0 ? SIZE : size;
     List<DeliveryOrders> deliveryOrders;
-    deliveryOrders = deliveryOrdersRepository.findAllBySupplier(usersRepository.findById(id).get(), PageRequest.of(p, s));
+    Optional<Users> users = usersRepository.findById(id);
+    deliveryOrders = deliveryOrdersRepository.findAllBySupplier(users.get(), PageRequest.of(p, s));
     deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getSupplier().getName().toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList());
     deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getBaseRef().toLowerCase().contains(baseRef.toLowerCase())).collect(Collectors.toList());
     deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getNumberOrderCustomer().toLowerCase().contains(cusNumber.toLowerCase())).collect(Collectors.toList());
+    DeliveryOrdersPage deliveryOrdersPage = new DeliveryOrdersPage(deliveryOrdersRepository.countBySupplier(users.get()) , deliveryOrders);
     return new ResponseEntity<>(
-            deliveryOrders, deliveryOrders == null ?
-            HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
+            deliveryOrdersPage, deliveryOrdersPage == null ?
             HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }
@@ -85,13 +86,14 @@ public class DeliveryOrdersController {
     int p = page == null ? 0 : page <= 0 ? 0 : page;
     int s = size == null ? SIZE : size <= 0 ? SIZE : size;
     List<DeliveryOrders> deliveryOrders;
-    deliveryOrders = deliveryOrdersRepository.findAllByCustomer(usersRepository.findById(id).get(), PageRequest.of(p, s));
+    Optional<Users> users = usersRepository.findById(id);
+    deliveryOrders = deliveryOrdersRepository.findAllByCustomer(users.get(), PageRequest.of(p, s));
     deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getSupplier().getName().toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList());
     deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getBaseRef().toLowerCase().contains(baseRef.toLowerCase())).collect(Collectors.toList());
     deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getNumberOrderCustomer().toLowerCase().contains(cusNumber.toLowerCase())).collect(Collectors.toList());
+    DeliveryOrdersPage deliveryOrdersPage = new DeliveryOrdersPage(deliveryOrdersRepository.countByCustomer(users.get()), deliveryOrders);
     return new ResponseEntity<>(
-            deliveryOrders, deliveryOrders == null ?
-            HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
+            deliveryOrdersPage, deliveryOrdersPage == null ?
             HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }

@@ -104,6 +104,8 @@ public class DetailsDeliveryOrders {
   @JsonBackReference
   private List<Notifications> notifications;
 
+  private String type;
+
   public void setParametrs(DeliveryOrders deliveryOrders) {
     this.deliveryOrder = deliveryOrders;
     this.baseRef = deliveryOrders.getBaseRef();

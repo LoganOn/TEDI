@@ -14,14 +14,14 @@ VALUES
 INSERT INTO `RelationsUsers`
   (`RelationUsersId`, `UserSupplierId`, `UserCustomerId`, `Active`, `CreationDate`, `ModifyDate`)
 VALUES
-(1, 1, 1, true, NOW(), NOW()),
-(2, 1, 2, true, NOW() - INTERVAL 1 WEEK, NOW()),
-(3, 1, 3, true, NOW() - INTERVAL 5 DAY, NOW() - INTERVAL 2 DAY),
-(4, 2, 1, false, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 10 MINUTE),
-(5, 2, 3, true, NOW() - INTERVAL 45 MINUTE, NOW()),
-(6, 3, 1, false, NOW() - INTERVAL 3 HOUR, NOW() - INTERVAL 1 HOUR),
-(7, 3, 2, false , NOW() - INTERVAL 2 DAY, NOW() - INTERVAL 1 DAY),
-(8, 3, 3, false, NOW() - INTERVAL 10 HOUR, NOW() - INTERVAL 150 MINUTE);
+(1, 4, 1, true, NOW(), NOW()),
+(2, 4, 2, true, NOW() - INTERVAL 1 WEEK, NOW()),
+(3, 4, 3, true, NOW() - INTERVAL 5 DAY, NOW() - INTERVAL 2 DAY),
+(4, 5, 1, false, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 10 MINUTE),
+(5, 5, 3, true, NOW() - INTERVAL 45 MINUTE, NOW()),
+(6, 6, 1, false, NOW() - INTERVAL 3 HOUR, NOW() - INTERVAL 1 HOUR),
+(7, 6, 2, false , NOW() - INTERVAL 2 DAY, NOW() - INTERVAL 1 DAY),
+(8, 6, 3, false, NOW() - INTERVAL 10 HOUR, NOW() - INTERVAL 150 MINUTE);
 
 INSERT INTO `DeliveryOrders`
   (`DeliveryOrderId`, `BaseRef`, `NumberOrderCustomer`, `DocStatus`, `UserSupplierId`, `UserCustomerId`, `DocTotal`, `DocNet`, `DocVatSum`, `Description`, `CreationDate`, `ModifyDate`)

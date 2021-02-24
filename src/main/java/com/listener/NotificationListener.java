@@ -17,6 +17,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationListener {
 
+  private final String ADDED_NEW_DELIVERY_ORDERS = "Dodano nowe potwierdzenie zamówienia o numerze: ";
+
+  private final String UPDATED_DELIVERY_ORDERS = "Zaktualizowano potwierdzenie zamówienia o numerze: ";
+
+  private final String DELETED_DELIVERY_ORDERS = "Usunięto potwierdzenie zamówienia o numerze: ";
+
+  private final String ADDED_NEW_DETAILS_DELIVERY_ORDERS = "Dodano nową pozycje do potwierdzenie zamówienia o numerze: ";
+
+  private final String UPDATED_DETAILS_DELIVERY_ORDERS = "Zaktualizowano pozycję w potwierdzeniu zamówienia o numerze: ";
+
+  private final String DELETED_DETAILS_DELIVERY_ORDERS = "Usunięto pozycję w potwierdzenie zamówienia o numerze: ";
+
   private final SubscriptionsRepository subscriptionsRepository;
 
   private final NotificationService notificationService;
@@ -27,23 +39,21 @@ public class NotificationListener {
 
   @Subscribe
   public void newDeliveryOrders(DeliveryOrders deliveryOrders) {
-
     List<Users> usersNotifications = usersRepository.findByNotificationTrue();
+    newDeliveryOrdersNotifications(deliveryOrders, usersNotifications);
+  }
 
+  @Subscribe
+  public void newDetailsDeliveryOrders(DetailsDeliveryOrders detailsDeliveryOrders) {
+    List<Users> usersNotifications = usersRepository.findByNotificationTrue();
     List<Subscriptions> subscriptions = subscriptionsRepository.findByEmailTrue();
 
     List<Users> usersSubscriptions = new ArrayList<>();
     for (Subscriptions s : subscriptions) {
       usersSubscriptions.add(s.getCustomer());
     }
-
-    newDeliveryOrdersNotifications(deliveryOrders, usersNotifications);
-    newDeliveryOrdersSubscriptions(deliveryOrders, usersSubscriptions);
-  }
-
-  @Subscribe
-  public void newDetailsDeliveryOrders(DetailsDeliveryOrders detailsDeliveryOrders) {
-    System.out.println(detailsDeliveryOrders.toString());
+    newDetailsDeliveryOrdersNotifications(detailsDeliveryOrders, usersNotifications);
+    newDetailsDeliveryOrdersSubscriptions(detailsDeliveryOrders, usersSubscriptions);
   }
 
   public void newDeliveryOrdersNotifications(DeliveryOrders deliveryOrders, List<Users> usersNotifications) {
@@ -51,65 +61,50 @@ public class NotificationListener {
     ) {
       String content = "";
       if (deliveryOrders.getType().equals("post")) {
-        content = "Added new delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer() + "and " + deliveryOrders.getDetailsDeliveryOrdersList().size() + " items";
+        content = ADDED_NEW_DELIVERY_ORDERS + deliveryOrders.getNumberOrderCustomer() + " z " + deliveryOrders.getDetailsDeliveryOrdersList().size() + " pozycjami";
       } else if (deliveryOrders.getType().equals("put")) {
-        content = "Updated delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
+        content = UPDATED_DELIVERY_ORDERS + deliveryOrders.getNumberOrderCustomer();
       } else if (deliveryOrders.getType().equals("patch")) {
-        content = "Updated delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
+        content = UPDATED_DELIVERY_ORDERS + deliveryOrders.getNumberOrderCustomer();
       } else if (deliveryOrders.getType().equals("delete")) {
-        content = "Deleted delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
+        content = DELETED_DELIVERY_ORDERS + deliveryOrders.getNumberOrderCustomer();
       }
       notificationService.save(new Notifications(deliveryOrders, null, u, content, false, new Timestamp(System.currentTimeMillis())));
     }
   }
 
-  public void newDeliveryOrdersSubscriptions(DeliveryOrders deliveryOrders, List<Users> usersSubscriptions) {
-    for (Users u : usersSubscriptions
-    ) {
-      String content = "";
-      if (deliveryOrders.getType().equals("post")) {
-        content = "Added new delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
-      } else if (deliveryOrders.getType().equals("put")) {
-        content = "Updated delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
-      } else if (deliveryOrders.getType().equals("patch")) {
-        content = "Updated delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
-      } else if (deliveryOrders.getType().equals("delete")) {
-        content = "Deleted delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
-      }
-     emailSender.sendEmail(u.getEmail(), "Delivery order number : " + deliveryOrders.getNumberOrderCustomer(), content);
-    }
-  }
-  public void newDetailsDeliveryOrdersNotifications(DeliveryOrders deliveryOrders, List<Users> usersNotifications) {
+  public void newDetailsDeliveryOrdersNotifications(DetailsDeliveryOrders detailsDeliveryOrders, List<Users> usersNotifications) {
     for (Users u : usersNotifications
     ) {
       String content = "";
-      if (deliveryOrders.getType().equals("post")) {
-        content = "Added new delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer() + "and " + deliveryOrders.getDetailsDeliveryOrdersList().size() + " items";
-      } else if (deliveryOrders.getType().equals("put")) {
-        content = "Updated delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
-      } else if (deliveryOrders.getType().equals("patch")) {
-        content = "Updated delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
-      } else if (deliveryOrders.getType().equals("delete")) {
-        content = "Deleted delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
+      if (detailsDeliveryOrders.getType().equals("post")) {
+        content = ADDED_NEW_DETAILS_DELIVERY_ORDERS + detailsDeliveryOrders.getDeliveryOrder().getNumberOrderCustomer();
+      } else if (detailsDeliveryOrders.getType().equals("put")) {
+        content = UPDATED_DETAILS_DELIVERY_ORDERS + detailsDeliveryOrders.getDeliveryOrder().getNumberOrderCustomer() ;
+      } else if (detailsDeliveryOrders.getType().equals("patch")) {
+        content = UPDATED_DETAILS_DELIVERY_ORDERS + detailsDeliveryOrders.getDeliveryOrder().getNumberOrderCustomer() ;
+      } else if (detailsDeliveryOrders.getType().equals("delete")) {
+        content = DELETED_DETAILS_DELIVERY_ORDERS + detailsDeliveryOrders.getDeliveryOrder().getNumberOrderCustomer() ;
       }
-      notificationService.save(new Notifications(deliveryOrders, null, u, content, false, new Timestamp(System.currentTimeMillis())));
+      notificationService.save(new Notifications(null, detailsDeliveryOrders, u, content, false, new Timestamp(System.currentTimeMillis())));
     }
   }
 
-  public void newDetailsDeliveryOrdersSubscriptions(DeliveryOrders deliveryOrders, List<Users> usersSubscriptions) {
+  public void newDetailsDeliveryOrdersSubscriptions(DetailsDeliveryOrders detailsDeliveryOrders, List<Users> usersSubscriptions) {
     for (Users u : usersSubscriptions
     ) {
       String content = "";
-      if (deliveryOrders.getType().equals("post")) {
-        content = "Added new delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
-      } else if (deliveryOrders.getType().equals("put")) {
-        content = "Updated delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
-      } else if (deliveryOrders.getType().equals("patch")) {
-        content = "Updated delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
-      } else if (deliveryOrders.getType().equals("delete")) {
-        content = "Deleted delivery orders from supplier, with number : " + deliveryOrders.getNumberOrderCustomer();
+      if (detailsDeliveryOrders.getType().equals("post")) {
+        content = ADDED_NEW_DETAILS_DELIVERY_ORDERS + detailsDeliveryOrders.getDeliveryOrder().getNumberOrderCustomer();
+      } else if (detailsDeliveryOrders.getType().equals("put")) {
+        content = UPDATED_DETAILS_DELIVERY_ORDERS + detailsDeliveryOrders.getDeliveryOrder().getNumberOrderCustomer();
+      } else if (detailsDeliveryOrders.getType().equals("patch")) {
+        content = UPDATED_DETAILS_DELIVERY_ORDERS + detailsDeliveryOrders.getDeliveryOrder().getNumberOrderCustomer();
+      } else if (detailsDeliveryOrders.getType().equals("delete")) {
+        content = DELETED_DETAILS_DELIVERY_ORDERS + detailsDeliveryOrders.getDeliveryOrder().getNumberOrderCustomer();
       }
-      emailSender.sendEmail(u.getEmail(), "Delivery order number : " + deliveryOrders.getNumberOrderCustomer(), content);
+      System.out.println(u.getEmail() + "TEDI - Potwierdzenie zamówienia dostawy: " + detailsDeliveryOrders.getDeliveryOrder().getNumberOrderCustomer() +  content);
+      emailSender.sendEmail(u.getEmail(), "TEDI - Potwierdzenie zamówienia dostawy: " + detailsDeliveryOrders.getDeliveryOrder().getNumberOrderCustomer(), content);
     }
   }
 }
