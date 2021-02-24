@@ -1,11 +1,13 @@
 package com.service;
 
+import com.google.common.eventbus.EventBus;
 import com.handler.DeliveryOrdersDTO;
 import com.model.DeliveryOrders;
 import com.model.DetailsDeliveryOrders;
 import com.model.Users;
 import com.repository.DeliveryOrdersRepository;
 import com.repository.DetailsDeliveryOrderRepository;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,8 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class OrderService {
+
+  private final EventBus eventBus;
 
   private final DeliveryOrdersRepository deliveryOrdersRepository;
 
@@ -31,16 +35,21 @@ public class OrderService {
       x.setParametrs(deliveryOrders);
       detailsDeliveryOrderRepository.save(x);
     });
+    deliveryOrders.setType("post");
+    eventBus.post(deliveryOrders);
     return deliveryOrders;
   }
 
   public DeliveryOrders saveDeliveryOrders(DeliveryOrders deliveryOrders) {
+    deliveryOrders.setType("patch");
+    eventBus.post(deliveryOrders);
     return deliveryOrdersRepository.save(deliveryOrders);
   }
 
   public DeliveryOrders update(Optional<DeliveryOrders> optionalDeliveryOrders, DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier){
     DeliveryOrders deliveryOrders = optionalDeliveryOrders.get();
     deliveryOrders.updateDeliveryOrders(deliveryOrdersDTO, customer, supplier);
+    deliveryOrders.setType("put");
     deliveryOrdersRepository.save(deliveryOrders);
     if( deliveryOrdersDTO.getDetailsDeliveryOrdersList() != null && !deliveryOrdersDTO.getDetailsDeliveryOrdersList().isEmpty()) {
       deliveryOrdersDTO.getDetailsDeliveryOrdersList().forEach(x -> {
@@ -49,6 +58,7 @@ public class OrderService {
           detailService.updateAll(deliveryOrders, detailsDeliveryOrders.get(), x, customer, supplier);
       });
     }
+    eventBus.post(deliveryOrders);
     return deliveryOrders;
   }
 
@@ -60,6 +70,8 @@ public class OrderService {
         detailService.delete(d);
       }
     }
+    deliveryOrders.setType("delete");
+    eventBus.post(deliveryOrders);
     deliveryOrdersRepository.delete(deliveryOrders);
   }
 }

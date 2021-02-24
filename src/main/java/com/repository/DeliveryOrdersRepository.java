@@ -25,6 +25,10 @@ public interface DeliveryOrdersRepository extends CrudRepository<DeliveryOrders,
 
     List<DeliveryOrders> findAll();
 
+    Long countByCustomer(Users customer);
+
+    Long countBySupplier(Users supplier);
+
 //    @Query(value = "SELECT d.deliveryOrderId, d.baseRef, d.numberOrderCustomer, d.docStatus, c.name, d.docTotal, d.docNet, d.docVatSum, d.creationDate FROM DeliveryOrders d " +
 //            "JOIN Users s ON s.userId = d.userId1 " +
 //            "JOIN Users c on c.userId = d.userId2 " +

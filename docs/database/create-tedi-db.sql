@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `CreationDate` Timestamp NOT NULL,
   `UserVerified` boolean,
   `Active` boolean,
+  `Notification` boolean,
   PRIMARY KEY (`UserId`)
 );
 
@@ -48,9 +49,9 @@ CREATE TABLE IF NOT EXISTS `DeliveryOrders` (
   `ModifyDate` Timestamp NOT NULL,
   PRIMARY KEY (`DeliveryOrderId`),
   FOREIGN KEY (`UserSupplierId`)
-            REFERENCES Users(UserId),
+    REFERENCES Users(UserId),
   FOREIGN KEY (`UserCustomerId`)
-        REFERENCES Users(UserId)
+    REFERENCES Users(UserId)
 );
 
 CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
@@ -79,12 +80,46 @@ CREATE TABLE IF NOT EXISTS `DetailsDeliveryOrders` (
   `ModifyDate` Timestamp NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`DeliveryOrderId`)
-      REFERENCES DeliveryOrders(DeliveryOrderId),
+    REFERENCES DeliveryOrders(DeliveryOrderId),
   FOREIGN KEY (`UserSupplierId`)
-            REFERENCES Users(UserId),
+    REFERENCES Users(UserId),
   FOREIGN KEY (`UserCustomerId`)
-        REFERENCES Users(UserId)
+    REFERENCES Users(UserId)
 );
+
+CREATE TABLE IF NOT EXISTS `Notifications` (
+  `NotificationId` Integer NOT NULL AUTO_INCREMENT,
+  `DeliveryOrderId` Integer,
+  `DetailDeliveryOrderId` Integer,
+  `UserCustomerId` Integer,
+  `Content` Text,
+  `Readed` boolean,
+  `CreationDate` Timestamp NOT NULL,
+  PRIMARY KEY (`NotificationId`),
+  FOREIGN KEY (`UserCustomerId`)
+    REFERENCES Users(UserId),
+  FOREIGN KEY (`DeliveryOrderId`)
+    REFERENCES DeliveryOrders(DeliveryOrderId),
+  FOREIGN KEY (`DetailDeliveryOrderId`)
+    REFERENCES DetailsDeliveryOrders(id)
+);
+
+CREATE TABLE IF NOT EXISTS `Subscriptions` (
+  `SubscriptionsId` Integer NOT NULL AUTO_INCREMENT,
+  `DeliveryOrderId` Integer,
+  `DetailDeliveryOrderId` Integer,
+  `UserCustomerId` Integer,
+  `CreationDate` Timestamp NOT NULL,
+  `Email` boolean,
+  PRIMARY KEY (`SubscriptionsId`),
+  FOREIGN KEY (`DeliveryOrderId`)
+    REFERENCES DeliveryOrders(DeliveryOrderId),
+  FOREIGN KEY (`DetailDeliveryOrderId`)
+    REFERENCES DetailsDeliveryOrders(id),
+  FOREIGN KEY (`UserCustomerId`)
+    REFERENCES Users(UserId)
+);
+
 #Trzeba bedzie zaimplementowac cos na wzor danych podstawowych Yuppim
 CREATE TABLE IF NOT EXISTS `Items` (
   `ItemId` Integer NOT NULL AUTO_INCREMENT,

@@ -1,5 +1,6 @@
 package com.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.handler.DeliveryOrdersDTO;
 import lombok.*;
@@ -8,7 +9,6 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Getter
@@ -64,6 +64,16 @@ public class DeliveryOrders {
   @OneToMany(mappedBy = "deliveryOrder", orphanRemoval = true)
   @JsonManagedReference
   private List<DetailsDeliveryOrders> detailsDeliveryOrdersList;
+
+  @OneToMany(mappedBy = "deliveryOrders", orphanRemoval = true)
+  @JsonBackReference
+  private List<Subscriptions> subscriptions;
+
+  @OneToMany(mappedBy = "deliveryOrders", orphanRemoval = true)
+  @JsonBackReference
+  private List<Notifications> notifications;
+
+  private String type;
 
   public DeliveryOrders(DeliveryOrdersDTO deliveryOrdersDTO, Users customer, Users supplier) {
     List<DetailsDeliveryOrders> list = new ArrayList<>();
