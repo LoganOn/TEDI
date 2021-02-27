@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.Security.JWTTokenProvider;
 import com.exception.BadUsernameOrPasswordException;
 import com.exception.UserNotFoundException;
 import com.exception.UserNotRegisteredException;
@@ -40,6 +41,8 @@ public class SignInController {
   private final AuthenticationManager authenticationManager;
 
   private final UserDetailsService userDetailsService;
+
+  private final JWTTokenProvider jwtTokenProvider;
 
   private final UserService userService;
 

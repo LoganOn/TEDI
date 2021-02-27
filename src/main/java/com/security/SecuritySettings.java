@@ -1,5 +1,6 @@
 package com.security;
 
+import com.Security.JWTTokenProvider;
 import com.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +12,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
@@ -29,7 +32,13 @@ public class SecuritySettings extends WebSecurityConfigurerAdapter {
 
   private final CustomUserDetailsService customUserDetailsService;
 
+  private final JWTTokenProvider jwtTokenProvider;
+
+  private final JWTBlackListService jwtBlackListService;
+
   private final PasswordEncoder passwordEncoder;
+
+  private final UserDetailsService userDetailsService;
 
   @Bean
   public HttpFirewall allowSemicolonHttpFirewall() {
@@ -75,5 +84,6 @@ public class SecuritySettings extends WebSecurityConfigurerAdapter {
             .and()
             .authorizeRequests().antMatchers(HttpMethod.OPTIONS,"*/").permitAll()
             .antMatchers(HttpMethod.POST,"/login").permitAll();
+    http.apply(new JwtConfigurer(jwtTokenProvider, jwtBlackListService, userDetailsService));
   }
 }
