@@ -43,8 +43,6 @@ public class JWTTokenProvider {
 
   private static final String CLAIMS_REFRESH_KEY = "refresh_key";
 
-  private static final String SECRET_FOR_MACHINE_KEY = "secret_for_machine";
-
   private static final String REFRESH_VALUE = "refresh_value";
 
   public static final int BEARER_PREFIX_LENGTH = 7;

@@ -1,6 +1,9 @@
 package com.service;
 
 import java.util.List;
+
+import com.model.JWTBlackList;
+import com.repository.JWTBlackListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -17,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,8 +26,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/login")
@@ -49,6 +54,7 @@ public class SignInController {
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public SignInResponse signIn(@RequestBody LoginCredentials loginCredentials, HttpServletResponse response)
           throws UserNotFoundException, BadUsernameOrPasswordException, UserNotRegisteredException {
+    System.out.println("jestem");
     String email = loginCredentials.getEmail();
     String password = loginCredentials.getPassword();
     try {
@@ -58,6 +64,16 @@ public class SignInController {
       throw new BadUsernameOrPasswordException(WRONG_USERNAME_PASSWORD);
     }
     UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+    ArrayList<String> userRoles = (ArrayList<String>) userDetails.getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList());
+    String token = jwtTokenProvider.createToken(email, userRoles);
+    String refreshToken = jwtTokenProvider.createRefresh(email, userRoles);
+    final Map<String, Cookie> cookies = jwtTokenProvider.generateCookies(token, refreshToken);
+    response.addCookie(cookies.get("accessCookie"));
+    response.addCookie(cookies.get("refreshCookie"));
+
     if (userDetails instanceof UserPrincipal) {
       Optional<Users> users_info = userService.loadUserByEmail(userDetails.getUsername());
       if (users_info.isPresent()) {
