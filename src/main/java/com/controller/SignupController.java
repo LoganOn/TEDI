@@ -7,6 +7,7 @@ import com.exception.UserNotRegisteredException;
 import com.exception.ValidationFailure;
 import com.handler.UserSignupDto;
 import com.model.Users;
+import com.security.JWT.JWTTokenProvider;
 import com.service.EmailSender;
 import com.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,8 @@ public class SignupController {
 
   private final EmailSender emailSender;
 
+  private final JWTTokenProvider jwtTokenProvider;
+
   private final ApplicationEventPublisher eventPublisher;
 
   private final Pattern pattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}+$");
@@ -67,6 +70,7 @@ public class SignupController {
     }
     Users registered = userService.save(signupDto);
     eventPublisher.publishEvent(new OnSignupCompleteEvent(registered, request.getLocale(), "appUrl"));
+    jwtTokenProvider.createTokenForUserApi(registered);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

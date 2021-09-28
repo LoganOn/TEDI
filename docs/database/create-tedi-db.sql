@@ -120,6 +120,11 @@ CREATE TABLE IF NOT EXISTS `Subscriptions` (
     REFERENCES Users(UserId)
 );
 
+CREATE TABLE IF NOT EXISTS `JWTBlackList` (
+  `Token` Varchar(255),
+  `ExpireTime` Long
+);
+
 #Trzeba bedzie zaimplementowac cos na wzor danych podstawowych Yuppim
 CREATE TABLE IF NOT EXISTS `Items` (
   `ItemId` Integer NOT NULL AUTO_INCREMENT,
