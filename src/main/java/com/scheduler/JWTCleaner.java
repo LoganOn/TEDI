@@ -16,11 +16,10 @@ import org.springframework.stereotype.Component;
 public class JWTCleaner {
   private final JWTBlackListService jwtBlackListService;
 
-  @Scheduled(fixedDelay = 10000L)
+  @Scheduled(cron="0 0 0 1 1/1 *")
   public void deleteExpiredTokens(){
     Long time = new Date().getTime();
     List<JWTBlackList> jwtBlackLists = jwtBlackListService.findAllByExpireTimeBefore(time);
     jwtBlackListService.deleteAll(jwtBlackLists);
-    log.info("Black list tokens : " +jwtBlackLists);
   }
 }

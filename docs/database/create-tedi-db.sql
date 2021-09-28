@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `UserVerified` boolean,
   `Active` boolean,
   `Notification` boolean,
+  `TokenApi` Varchar(255),
   PRIMARY KEY (`UserId`)
 );
 

@@ -1,8 +1,10 @@
 package com.security.JWT;
 
 import com.exception.JwtAuthenticationFailedException;
+import com.handler.UserMinimalInfo;
 import com.model.Users;
 import com.provider.SecretKeyProvider;
+import com.repository.UsersRepository;
 import io.jsonwebtoken.Claims;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,6 +18,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import static io.jsonwebtoken.SignatureAlgorithm.HS512;
 import java.io.IOException;
+import java.util.Optional;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -38,8 +41,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
     private static final String CLAIMS_REFRESH_KEY = "refresh_key";
 
-    private static final String SECRET_FOR_MACHINE_KEY = "secret_for_machine";
-
     private static final String REFRESH_VALUE = "refresh_value";
 
     public static final int BEARER_PREFIX_LENGTH = 7;
@@ -48,14 +49,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 
     private final SecretKeyProvider secretKeyProvider;
 
+    private final UsersRepository usersRepository;
+
     @Value("${security.jwt.token.expiration-length}")
     private Long expirationLength;
 
     @Value("${security.jwt.token.expiration-length-refresh}")
     private Long expirationLengthRefresh;
 
-    @Value("${secret.for.machine.access.token}")
-    private String SECRET_FOR_MACHINE_ACCESS;
+    @Value("${security.jwt.token.expiration-length-user-api-token}")
+    private Long expirationLengthUserApiKey;
+
+    @Value("${secret.for.user.api.access.token}")
+    private String SECRET_FOR_USER_API_ACCESS;
 
     private byte[] secretKey;
 
@@ -97,6 +103,11 @@ import org.springframework.security.core.userdetails.UserDetails;
       return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    public UserMinimalInfo getCurrentUser(String token){
+      Optional<Users> usersOptional = usersRepository.findByEmail(getEmail(token));
+      return new UserMinimalInfo(usersOptional.get());
+    }
+
     public String getEmail(String token) {
       return Jwts.parser()
               .setSigningKey(secretKey)
@@ -120,7 +131,7 @@ import org.springframework.security.core.userdetails.UserDetails;
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody()
-                .containsValue(SECRET_FOR_MACHINE_ACCESS)
+                .containsValue(SECRET_FOR_USER_API_ACCESS)
                 ||
                 (Jwts.parser()
                         .setSigningKey(secretKey)
@@ -162,11 +173,11 @@ import org.springframework.security.core.userdetails.UserDetails;
     public String createTokenForUserApi(Users userApi) {
       Claims claims = Jwts.claims().setSubject(userApi.getEmail());
       claims.put(CLAIMS_ROLES_KEY, "ROLE_" + userApi.getRole());
-      claims.put(SECRET_FOR_MACHINE_KEY, SECRET_FOR_MACHINE_ACCESS);
       Date now = new Date();
       return Jwts.builder()
               .setClaims(claims)
               .setIssuedAt(now)
+              .setExpiration(new Date(now.getTime() + expirationLengthUserApiKey))
               .signWith(HS512, secretKey)
               .compact();
     }

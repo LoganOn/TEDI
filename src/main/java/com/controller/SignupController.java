@@ -70,7 +70,8 @@ public class SignupController {
     }
     Users registered = userService.save(signupDto);
     eventPublisher.publishEvent(new OnSignupCompleteEvent(registered, request.getLocale(), "appUrl"));
-    jwtTokenProvider.createTokenForUserApi(registered);
+    registered.setTokenApi(jwtTokenProvider.createTokenForUserApi(registered));
+    userService.save(registered);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

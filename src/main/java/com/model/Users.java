@@ -57,6 +57,9 @@ public class Users {
   @Column(name = "Notification")
   private Boolean notification;
 
+  @Column(name = "TokenApi")
+  private String tokenApi;
+
   public Users(String name, String email, String password, String phone, String role) {
     this.name = name;
     this.email = email;

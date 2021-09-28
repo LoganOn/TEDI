@@ -4,12 +4,13 @@ import com.exception.BadRequestException;
 import com.exception.ResourceNotFoundException;
 import com.handler.DeliveryOrdersDTO;
 import com.handler.DeliveryOrdersPage;
+import com.handler.UserMinimalInfo;
 import com.model.DeliveryOrders;
-import com.model.MinimalInfo;
 import com.model.Users;
 import com.repository.DeliveryOrdersRepository;
 import com.repository.UsersRepository;
 import com.service.OrderService;
+import com.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.ReflectionUtils;
@@ -45,6 +46,8 @@ public class DeliveryOrdersController {
 
   private final UsersRepository usersRepository;
 
+  private final UserService userService;
+
   private static final int SIZE = 20;
 
   @GetMapping("/{id}")
@@ -52,48 +55,6 @@ public class DeliveryOrdersController {
     Optional<DeliveryOrders> deliveryOrder = deliveryOrdersRepository.findById(id);
     return new ResponseEntity<>(
             deliveryOrder, deliveryOrder.isEmpty() ?
-            HttpStatus.NO_CONTENT : HttpStatus.OK
-    );
-  }
-
-  @GetMapping("/supplier/{id}")
-  public ResponseEntity<?> findAllOrdersBySupplierId(@PathVariable Long id,
-                                                     @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size,
-                                                     @RequestParam(required = false, defaultValue = "") String name,
-                                                     @RequestParam(required = false, defaultValue = "") String baseRef,
-                                                     @RequestParam(required = false, defaultValue = "") String cusNumber) {
-    int p = page == null ? 0 : page <= 0 ? 0 : page;
-    int s = size == null ? SIZE : size <= 0 ? SIZE : size;
-    List<DeliveryOrders> deliveryOrders;
-    Optional<Users> users = usersRepository.findById(id);
-    deliveryOrders = deliveryOrdersRepository.findAllBySupplier(users.get(), PageRequest.of(p, s));
-    deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getSupplier().getName().toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList());
-    deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getBaseRef().toLowerCase().contains(baseRef.toLowerCase())).collect(Collectors.toList());
-    deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getNumberOrderCustomer().toLowerCase().contains(cusNumber.toLowerCase())).collect(Collectors.toList());
-    DeliveryOrdersPage deliveryOrdersPage = new DeliveryOrdersPage(deliveryOrdersRepository.countBySupplier(users.get()) , deliveryOrders);
-    return new ResponseEntity<>(
-            deliveryOrdersPage, deliveryOrdersPage == null ?
-            HttpStatus.NO_CONTENT : HttpStatus.OK
-    );
-  }
-
-  @GetMapping("/customer/{id}")
-  public ResponseEntity<?> findAllOrdersByCustomerId(@PathVariable Long id,
-                                                     @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size,
-                                                     @RequestParam(required = false, defaultValue = "") String name,
-                                                     @RequestParam(required = false, defaultValue = "") String baseRef,
-                                                     @RequestParam(required = false, defaultValue = "") String cusNumber) {
-    int p = page == null ? 0 : page <= 0 ? 0 : page;
-    int s = size == null ? SIZE : size <= 0 ? SIZE : size;
-    List<DeliveryOrders> deliveryOrders;
-    Optional<Users> users = usersRepository.findById(id);
-    deliveryOrders = deliveryOrdersRepository.findAllByCustomer(users.get(), PageRequest.of(p, s));
-    deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getSupplier().getName().toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList());
-    deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getBaseRef().toLowerCase().contains(baseRef.toLowerCase())).collect(Collectors.toList());
-    deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getNumberOrderCustomer().toLowerCase().contains(cusNumber.toLowerCase())).collect(Collectors.toList());
-    DeliveryOrdersPage deliveryOrdersPage = new DeliveryOrdersPage(deliveryOrdersRepository.countByCustomer(users.get()), deliveryOrders);
-    return new ResponseEntity<>(
-            deliveryOrdersPage, deliveryOrdersPage == null ?
             HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }
@@ -115,21 +76,24 @@ public class DeliveryOrdersController {
   }
 
   @GetMapping()
-  public ResponseEntity<?> findOrdersByUserandBaseRefandCustomerNumber(@RequestBody MinimalInfo minimalInfo, @RequestParam(required = false, defaultValue = "") String name,
+  public ResponseEntity<?> findOrdersByUserandBaseRefandCustomerNumber(@RequestParam(required = false, defaultValue = "") String name,
                                                                        @RequestParam(required = false, defaultValue = "") String baseRef,
                                                                        @RequestParam(required = false, defaultValue = "") String cusNumber,
                                                                        @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size) {
     List<DeliveryOrders> deliveryOrders;
     int p = page == null ? 0 : page <= 0 ? 0 : page;
-    int s = size == null ? 1 : size <= 20 ? SIZE : size;
+    int s = size == null ? SIZE : size <= 20 ? SIZE : size;
 
-    if (minimalInfo.getRole().equals("customer")) {
-      deliveryOrders = deliveryOrdersRepository.findAllByCustomer(usersRepository.findById(minimalInfo.getUserid()).get(), PageRequest.of(p, s));
+    UserMinimalInfo userMinimalInfo = userService.getCurrentUser();
+    Optional<Users> users = usersRepository.findById(userMinimalInfo.getUserId());
+    if (userMinimalInfo.getRole().equals("customer")) {
+      deliveryOrders = deliveryOrdersRepository.findAllByCustomer(users.get(), PageRequest.of(p, s));
+      System.out.println(deliveryOrders.size());
       deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getSupplier().getName().toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList());
       deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getBaseRef().toLowerCase().contains(baseRef.toLowerCase())).collect(Collectors.toList());
       deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getNumberOrderCustomer().toLowerCase().contains(cusNumber.toLowerCase())).collect(Collectors.toList());
-    } else if (minimalInfo.getRole().equals("supplier")) {
-      deliveryOrders = deliveryOrdersRepository.findAllBySupplier(usersRepository.findById(minimalInfo.getUserid()).get(), PageRequest.of(p, s));
+    } else if (userMinimalInfo.getRole().equals("supplier")) {
+      deliveryOrders = deliveryOrdersRepository.findAllBySupplier(users.get(), PageRequest.of(p, s));
       deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getSupplier().getName().toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList());
       deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getBaseRef().toLowerCase().contains(baseRef.toLowerCase())).collect(Collectors.toList());
       deliveryOrders = deliveryOrders.stream().filter(delivery -> delivery.getNumberOrderCustomer().toLowerCase().contains(cusNumber.toLowerCase())).collect(Collectors.toList());
@@ -137,9 +101,9 @@ public class DeliveryOrdersController {
       deliveryOrders = null;
     }
 
+    DeliveryOrdersPage deliveryOrdersPage = new DeliveryOrdersPage(deliveryOrdersRepository.countByCustomer(users.get()), deliveryOrders);
     return new ResponseEntity<>(
-            deliveryOrders, deliveryOrders == null ?
-            HttpStatus.NOT_FOUND : deliveryOrders.isEmpty() ?
+            deliveryOrdersPage, deliveryOrdersPage == null ?
             HttpStatus.NO_CONTENT : HttpStatus.OK
     );
   }

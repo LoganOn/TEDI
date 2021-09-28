@@ -2,11 +2,13 @@ package com.controller;
 
 import com.exception.BadRequestException;
 import com.handler.DeliveryOrdersDTO;
+import com.handler.UserMinimalInfo;
 import com.model.DeliveryOrders;
 import com.model.Notifications;
 import com.model.Users;
 import com.repository.NotificationsRepository;
 import com.repository.UsersRepository;
+import com.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,8 @@ public class NotificationsController {
 
   private final UsersRepository usersRepository;
 
+  private final UserService userService;
+
   @GetMapping("/{id}")
   public ResponseEntity<?> findNotificationById(@PathVariable Long id) {
     Optional<Notifications> notification = notificationsRepository.findById(id);
@@ -33,9 +37,10 @@ public class NotificationsController {
     );
   }
 
-  @GetMapping("/users/{id}")
-  public ResponseEntity<?> findNotificationByUserID(@PathVariable Long id) {
-    List<Notifications> notification = notificationsRepository.findByCustomer(usersRepository.findById(id).get());
+  @GetMapping()
+  public ResponseEntity<?> findNotificationByUser() {
+    UserMinimalInfo userMinimalInfo = userService.getCurrentUser();
+    List<Notifications> notification = notificationsRepository.findByCustomer(usersRepository.findById(userMinimalInfo.getUserId()).get());
     return new ResponseEntity<>(
             notification, notification.isEmpty() ?
             HttpStatus.NO_CONTENT : HttpStatus.OK

@@ -27,7 +27,7 @@ public class JWTBlackListService {
     return jwtBlackListRepository.existsByToken(s);
   }
 
-  public JWTBlackList save(String jwtBlackList){
+  public JWTBlackList save(JWTBlackList jwtBlackList){
     if(jwtBlackList != null)
       return jwtBlackListRepository.save(jwtBlackList);
     return null;

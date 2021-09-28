@@ -103,9 +103,9 @@ protected void configure(HttpSecurity http) throws Exception {
           .authenticationEntryPoint(new RestAuthenticationEntryPoint())
           .and()
           .authorizeRequests()
-          .antMatchers("/api/login")
+          .antMatchers("/api/login", "/api/register")
           .permitAll()
-          .antMatchers("/api/**").access("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_SUPPLIER')")
+          .antMatchers("/api/delivery/**", "/api/relations/**", "/api/details/**", "/api/notifications/**", "/api/subscriptions/**", "/api/users/**").access("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_SUPPLIER')")
           .anyRequest()
   .authenticated();
   http.apply(new JWTConfigurer(jwtTokenProvider, jwtBlackListService));

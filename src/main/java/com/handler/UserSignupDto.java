@@ -30,5 +30,7 @@ public class UserSignupDto {
   private String email;
 
   private String phone;
+
+  private String role;
 }
 

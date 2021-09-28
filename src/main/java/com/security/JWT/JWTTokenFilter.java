@@ -52,7 +52,8 @@ public class JWTTokenFilter extends GenericFilterBean {
           else if(token == null)
             log.info(TOKEN_IS_NULL);
           else {
-            jwtBlackListService.save(token);
+            JWTBlackList jwtBlackList = new JWTBlackList(token,1L);
+            jwtBlackListService.save(jwtBlackList);
             log.info(TOKEN_NOT_VALID);
           }
         }
